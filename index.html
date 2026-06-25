@@ -62,6 +62,13 @@
   .track b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#2c2008}
   .stepper button{width:32px;height:30px;margin-left:5px}
   .mx{width:54px;text-align:center}
+  .eig .b .eigstep{display:flex;align-items:center;justify-content:center;gap:5px;margin-top:6px}
+  .eig .b .eigstep .val{margin-top:0}
+  .eigbtn{width:26px;height:30px;padding:0;font-size:17px;line-height:1;cursor:pointer;border-radius:5px;flex:none;background:#fffdf4;border:1px solid var(--line);color:var(--ink)}
+  .eigbtn:hover{background:#f3e4bd}
+  .ebonus{color:var(--gold);font-weight:600;min-width:24px;text-align:right}
+  .apsum{font-size:12px;color:var(--dim);margin:2px 0 4px}
+  .mxlab{display:flex;flex-direction:column;align-items:center;font-size:10px;color:var(--dim);gap:1px}
 
   .derived{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
   .derived .d{background:#fffdf4;border:1px solid var(--line);border-radius:6px;padding:9px 11px;text-align:center}
@@ -182,11 +189,13 @@
       <div class="twosub">
         <div><h3>Vorteile</h3>
           <div class="add"><input id="vorteilpick" list="dl-vorteile" placeholder="Vorteil suchen …" style="flex:1;min-width:140px"><button class="acc" onclick="addVorteil()">+</button></div>
-          <div class="tblwrap"><table><thead><tr><th>Vorteil</th><th>AP</th><th></th></tr></thead><tbody id="vorteile"></tbody></table></div>
+          <div class="tblwrap"><table><thead><tr><th>Vorteil</th><th>AP (kostet)</th><th></th></tr></thead><tbody id="vorteile"></tbody></table></div>
+          <div class="apsum" id="vsum"></div>
         </div>
         <div><h3>Nachteile</h3>
           <div class="add"><input id="nachteilpick" list="dl-nachteile" placeholder="Nachteil suchen …" style="flex:1;min-width:140px"><button class="acc" onclick="addNachteil()">+</button></div>
-          <div class="tblwrap"><table><thead><tr><th>Nachteil</th><th>AP</th><th></th></tr></thead><tbody id="nachteile"></tbody></table></div>
+          <div class="tblwrap"><table><thead><tr><th>Nachteil</th><th>AP (bringt)</th><th></th></tr></thead><tbody id="nachteile"></tbody></table></div>
+          <div class="apsum" id="nsum"></div>
         </div>
       </div>
       <h3>Allgemeine Sonderfertigkeiten</h3>
@@ -269,13 +278,15 @@
     <div class="box twosub">
       <div>
         <h3>Rüstungen</h3>
+        <div class="add"><input id="ruestungpick" list="dl-ruestungen" placeholder="Rüstung aus dem Regelwerk …" style="flex:1;min-width:150px"><button class="acc" onclick="addRuestung()">aus Liste</button></div>
         <div class="tblwrap"><table><thead><tr><th>Rüstung</th><th>Schutz</th><th>Belastung</th><th>Gewicht</th><th></th></tr></thead><tbody id="ruestung"></tbody></table></div>
-        <button onclick="add_ruestung()" style="margin-top:8px">+ Rüstung</button>
+        <button onclick="add_ruestung()" style="margin-top:8px">+ leere Zeile</button>
       </div>
       <div>
         <h3>Schild / Parierwaffe</h3>
+        <div class="add"><input id="schildpick" list="dl-schilde" placeholder="Schild aus dem Regelwerk …" style="flex:1;min-width:150px"><button class="acc" onclick="addSchild()">aus Liste</button></div>
         <div class="tblwrap"><table><thead><tr><th>Name</th><th>AT/PA-Mod</th><th>Gewicht</th><th></th></tr></thead><tbody id="schild"></tbody></table></div>
-        <button onclick="add_schild()" style="margin-top:8px">+ Schild</button>
+        <button onclick="add_schild()" style="margin-top:8px">+ leere Zeile</button>
       </div>
     </div>
 
@@ -554,14 +565,21 @@ function tableEditor(arrName, tbodyId, cols, blank, onChange){
     const tb=document.getElementById(tbodyId); if(!tb) return; tb.innerHTML="";
     C[arrName].forEach((row,idx)=>{
       const tr=document.createElement("tr");
-      tr.innerHTML = cols.map(c=>`<td class="${c.cls||''}"><input ${c.type==='number'?'type="number"':''}${c.list?` list="${c.list}"`:''} value="${esc(row[c.key])}" data-k="${c.key}" data-i="${idx}" placeholder="${c.ph||''}"></td>`).join('')
-        + `<td class="act"><button class="x" data-del="${idx}" title="entfernen">✕</button></td>`;
+      tr.innerHTML = cols.map(c=>{
+        const inner = c.sel
+          ? `<select data-k="${c.key}" data-i="${idx}">${c.sel.map(o=>`<option${esc(String(row[c.key]||""))===o?" selected":""}>${o}</option>`).join('')}</select>`
+          : `<input ${c.type==='number'?'type="number"':''}${c.list?` list="${c.list}"`:''} value="${esc(row[c.key])}" data-k="${c.key}" data-i="${idx}" placeholder="${c.ph||''}">`;
+        return `<td class="${c.cls||''}">${inner}</td>`;
+      }).join('') + `<td class="act"><button class="x" data-del="${idx}" title="entfernen">✕</button></td>`;
       tb.appendChild(tr);
     });
     tb.querySelectorAll("input[data-k]").forEach(inp=>inp.oninput=()=>{
       const c=cols.find(x=>x.key===inp.dataset.k);
       C[arrName][+inp.dataset.i][inp.dataset.k]= c.type==='number'?(parseFloat(inp.value)||0):inp.value;
       save(); if(onChange) onChange();
+    });
+    tb.querySelectorAll("select[data-k]").forEach(s=>s.onchange=()=>{
+      C[arrName][+s.dataset.i][s.dataset.k]=s.value; save(); if(onChange) onChange();
     });
     tb.querySelectorAll("button[data-del]").forEach(b=>b.onclick=()=>{ C[arrName].splice(+b.dataset.del,1); save(); render(); if(onChange) onChange(); });
   }
@@ -622,7 +640,12 @@ EIG.forEach(([k,voll])=>{
   b.innerHTML=`<div class="lab">${voll}</div>`;
   const i=document.createElement("input"); i.className="val"; i.type="number"; i.value=C.eig[k]; i.dataset.eig=k;
   i.oninput=()=>{ C.eig[k]=parseInt(i.value)||0; save(); renderDerived(); };
-  b.appendChild(i); eigBox.appendChild(b);
+  const upd=dd=>{ const v=(parseInt(i.value)||0)+dd; C.eig[k]=v; i.value=v; save(); renderDerived(); };
+  const row=document.createElement("div"); row.className="eigstep";
+  const bm=document.createElement("button"); bm.className="eigbtn"; bm.textContent="−"; bm.onclick=()=>upd(-1);
+  const bp=document.createElement("button"); bp.className="eigbtn"; bp.textContent="+"; bp.onclick=()=>upd(1);
+  row.appendChild(bm); row.appendChild(i); row.appendChild(bp);
+  b.appendChild(row); eigBox.appendChild(b);
 });
 
 // ───────── Energien + Schicksalspunkte ─────────
@@ -639,7 +662,7 @@ function renderEnergie(){
         <button data-k="${key}" data-v="-5">−5</button><button data-k="${key}" data-v="-1">−1</button>
         <button data-k="${key}" data-v="1">+1</button><button data-k="${key}" data-v="5">+5</button>
       </span>
-      <input class="mx" type="number" value="${e.max}" title="Maximum" data-max="${key}">`;
+      <label class="mxlab">Max<input class="mx" type="number" value="${e.max}" data-max="${key}"></label>`;
     enBox.appendChild(row);
   }
   // Schicksalspunkte (klein)
@@ -648,7 +671,7 @@ function renderEnergie(){
   sr.innerHTML=`<span class="lab">Schicksalspunkte</span>
     <div class="track"><span style="width:${s.max>0?Math.min(100,100*s.akt/s.max):0}%;background:var(--gold)"></span><b>${s.akt} / ${s.max}</b></div>
     <span class="stepper"><button data-sk="-1">−1</button><button data-sk="1">+1</button></span>
-    <input class="mx" type="number" value="${s.max}" title="Maximum" data-smax="1">`;
+    <label class="mxlab">Max<input class="mx" type="number" value="${s.max}" data-smax="1"></label>`;
   enBox.appendChild(sr);
 
   enBox.querySelectorAll("button[data-k]").forEach(b=>b.onclick=()=>{
@@ -708,10 +731,16 @@ function typklasse(name){
 }
 function renderTalentSelect(){
   sel.innerHTML="";
-  Object.keys(byKat).sort().forEach(kat=>{
-    const og=document.createElement("optgroup"); og.label=kat;
-    byKat[kat].sort().forEach(n=>{ const o=document.createElement("option"); o.value=n; const tk=typklasse(n);
-      o.textContent=n+(tk==="typisch"?"  ✓ typisch":tk==="untypisch"?"  ✗ untypisch":""); og.appendChild(o); });
+  const groups={typisch:[], neutral:[], untypisch:[]};
+  Object.keys(TALENTE).forEach(n=>{ const tk=typklasse(n); groups[tk==="typisch"?"typisch":tk==="untypisch"?"untypisch":"neutral"].push(n); });
+  [["typisch","✓ Typisch"],["neutral","Weitere Talente"],["untypisch","✗ Untypisch"]].forEach(([key,label])=>{
+    if(!groups[key].length) return;
+    const og=document.createElement("optgroup"); og.label=label;
+    groups[key].sort().forEach(n=>{ const o=document.createElement("option"); o.value=n;
+      const kurz=(TALENTE[n].kat||"").replace("talente","").replace("Talente",""), drin=(n in C.talente);
+      o.textContent = n + (kurz?` · ${kurz}`:"") + (drin?"  — schon dabei":"");
+      if(drin) o.disabled=true;
+      og.appendChild(o); });
     sel.appendChild(og);
   });
 }
@@ -753,13 +782,14 @@ function ladePregen(name){
   N.vorteile=splitListe(h.vorteile).map(x=>({name:x,ap:""}));
   N.nachteile=splitListe(h.nachteile).map(x=>({name:x,ap:""}));
   N.sonderf=h.sonderf||"";
-  N.sprachen=splitListe(h.sprachen).map(x=>({name:x,stufe:""}));
-  N.schriften=splitListe(h.schriften).map(x=>({name:x,komplex:""}));
+  const stufeAus=x=>{ const m=x.match(/^(.*?)\s+([IVX]{1,3})$/); return m?{n:m[1].trim(),s:m[2]}:{n:x,s:""}; };
+  N.sprachen=splitListe(h.sprachen).map(x=>{ const r=stufeAus(x); return {name:r.n,stufe:r.s}; });
+  N.schriften=splitListe(h.schriften).map(x=>{ const r=stufeAus(x); return {name:r.n,komplex:r.s}; });
   if((h.asp||0)>0) N.magie={leiteig:"",tradition:""};
   localStorage.setItem('dsa-bogen', JSON.stringify(N));
   location.reload();
 }
-function addTalent(){ const name=sel.value; if(!name||!TALENTE[name]) return; if(!(name in C.talente)) C.talente[name]=4; save(); renderTalente(); }
+function addTalent(){ const name=sel.value; if(!name||!TALENTE[name]) return; if(!(name in C.talente)) C.talente[name]=4; save(); renderTalente(); renderTalentSelect(); }
 const cssid = s => s.replace(/[^a-zA-Z0-9]/g,"_");
 const leitext = probe => probe.map(k=>NAME[k]).join(" · ");
 function probe(name){
@@ -773,7 +803,9 @@ function probe(name){
   const qs=gelungen?Math.min(6,Math.max(1,Math.ceil(Math.max(0,uebrig)/3))):0;
   const status = patzer?`<span class="tag b">Patzer!</span>`:crit?`<span class="tag g">Kritischer Erfolg!</span>`
     : gelungen?`<span class="tag g">gelungen · Qualität ${qs}</span>`:`<span class="tag b">misslungen</span>`;
-  document.getElementById("res-"+cssid(name)).innerHTML =
+  const rid="res-"+cssid(name);
+  document.getElementById(rid).innerHTML =
+    `<button class="x" title="ausblenden" style="float:right" onclick="document.getElementById('${rid}').innerHTML=''">✕</button>`+
     `${status} &nbsp; Würfe: ${det.join(" / ")} <span style="color:var(--dim)">gegen ${leitext(t.probe)} (${eig.join(" / ")})`+
     `${uebrig>=0?` — ${uebrig} Punkte übrig`:` — ${-uebrig} Punkte zu wenig`}</span>`;
 }
@@ -795,15 +827,15 @@ function renderTalente(){
   });
   box.querySelectorAll("input[data-fw]").forEach(i=>i.oninput=()=>{ C.talente[i.dataset.fw]=parseInt(i.value)||0; save(); });
   box.querySelectorAll("button[data-probe]").forEach(b=>b.onclick=()=>probe(b.dataset.probe));
-  box.querySelectorAll("button[data-del]").forEach(b=>b.onclick=()=>{ delete C.talente[b.dataset.del]; save(); renderTalente(); });
+  box.querySelectorAll("button[data-del]").forEach(b=>b.onclick=()=>{ delete C.talente[b.dataset.del]; save(); renderTalente(); renderTalentSelect(); });
 }
 renderTalente();
 
 // Sprachen & Schriften (mit Auswahllisten aus dem Regelwerk)
 function mkDatalist(id, items){ const dl=document.createElement("datalist"); dl.id=id; dl.innerHTML=items.map(x=>`<option value="${esc(x)}">`).join(""); document.body.appendChild(dl); }
 mkDatalist("dl-sprachen", SPRACHEN); mkDatalist("dl-schriften", SCHRIFTEN); mkDatalist("dl-sozialstatus", SOZIALSTATUS);
-const renderSprachen = tableEditor("sprachen","sprachen",[{key:"name",ph:"z.B. Garethi",list:"dl-sprachen"},{key:"stufe",cls:"num",ph:"I–III"}],{name:"",stufe:""});
-const renderSchriften = tableEditor("schriften","schriften",[{key:"name",ph:"z.B. Kusliker Zeichen",list:"dl-schriften"},{key:"komplex",cls:"num",ph:"I–III"}],{name:"",komplex:""});
+const renderSprachen = tableEditor("sprachen","sprachen",[{key:"name",ph:"z.B. Garethi",list:"dl-sprachen"},{key:"stufe",cls:"num",sel:["","I","II","III"]}],{name:"",stufe:""});
+const renderSchriften = tableEditor("schriften","schriften",[{key:"name",ph:"z.B. Kusliker Zeichen",list:"dl-schriften"},{key:"komplex",cls:"num",sel:["","I","II","III"]}],{name:"",komplex:""});
 
 // ───────── Kampf ─────────
 function renderTechniken(){
@@ -825,10 +857,14 @@ function renderTechniken(){
 renderTechniken();
 const renderNah = tableEditor("nahwaffen","nahwaffen",[{key:"name",ph:"z.B. Schwert",list:"dl-nahwaffen"},{key:"technik",ph:"Schwerter"},{key:"tp",cls:"num",ph:"1W6+4"},{key:"mod",cls:"num",ph:"0"},{key:"rw",cls:"num",ph:"kurz"},{key:"at",cls:"num"},{key:"pa",cls:"num"}],{name:"",technik:"",tp:"",mod:"",rw:"",at:"",pa:""});
 const renderFern = tableEditor("fernwaffen","fernwaffen",[{key:"name",ph:"z.B. Bogen",list:"dl-fernwaffen"},{key:"technik",ph:"Bögen"},{key:"ladezeit",cls:"num"},{key:"tp",cls:"num",ph:"1W6+4"},{key:"rw",ph:"50/100/200"},{key:"fk",cls:"num"}],{name:"",technik:"",ladezeit:"",tp:"",rw:"",fk:""});
-mkDatalist("dl-nahwaffen",(DSA.WAFFEN_NAH||[]).map(w=>w.name));
+mkDatalist("dl-nahwaffen",(DSA.WAFFEN_NAH||[]).filter(w=>w.technik!=="Schilde").map(w=>w.name));
 mkDatalist("dl-fernwaffen",(DSA.WAFFEN_FERN||[]).map(w=>w.name));
+mkDatalist("dl-ruestungen",(DSA.RUESTUNGEN||[]).map(r=>r.name));
+mkDatalist("dl-schilde",(DSA.WAFFEN_NAH||[]).filter(w=>w.technik==="Schilde").map(w=>w.name));
 function addNahwaffe(){ const inp=document.getElementById("nahwaffenpick"), w=(DSA.WAFFEN_NAH||[]).find(x=>x.name===inp.value.trim()); if(!w)return; C.nahwaffen.push({name:w.name,technik:w.technik,tp:w.tp,mod:`${w.at}/${w.pa}`,rw:w.rw,at:"",pa:""}); save(); renderNah(); inp.value=""; }
 function addFernwaffe(){ const inp=document.getElementById("fernwaffenpick"), w=(DSA.WAFFEN_FERN||[]).find(x=>x.name===inp.value.trim()); if(!w)return; C.fernwaffen.push({name:w.name,technik:w.technik,ladezeit:w.lz,tp:w.tp,rw:w.rw,fk:""}); save(); renderFern(); inp.value=""; }
+function addRuestung(){ const inp=document.getElementById("ruestungpick"), r=(DSA.RUESTUNGEN||[]).find(x=>x.name===inp.value.trim()); if(!r)return; C.ruestung.push({name:r.name,rs:r.rs,be:r.be,gewicht:""}); save(); renderRuestung(); inp.value=""; }
+function addSchild(){ const inp=document.getElementById("schildpick"), s=(DSA.WAFFEN_NAH||[]).find(x=>x.name===inp.value.trim()&&x.technik==="Schilde"); if(!s)return; C.schild.push({name:s.name,mod:`${s.at}/${s.pa}`,gewicht:""}); save(); renderSchild(); inp.value=""; }
 const renderRuestung = tableEditor("ruestung","ruestung",[{key:"name",ph:"z.B. Lederharnisch"},{key:"rs",cls:"num"},{key:"be",cls:"num"},{key:"gewicht",cls:"num"}],{name:"",rs:"",be:"",gewicht:""});
 const renderSchild = tableEditor("schild","schild",[{key:"name",ph:"z.B. Holzschild"},{key:"mod",cls:"num",ph:"+1/-1"},{key:"gewicht",cls:"num"}],{name:"",mod:"",gewicht:""});
 
@@ -870,13 +906,21 @@ bindText("edelsteine",()=>C.edelsteine,v=>C.edelsteine=v);
 bindText("tragkraft",()=>C.tragkraft,v=>C.tragkraft=v);
 bindText("tier",()=>C.tier,v=>C.tier=v);
 bindText("notizen",()=>C.notizen,v=>C.notizen=v);
-const renderVorteile = tableEditor("vorteile","vorteile",[{key:"name",list:"dl-vorteile"},{key:"ap",cls:"num"}],{name:"",ap:""});
-const renderNachteile = tableEditor("nachteile","nachteile",[{key:"name",list:"dl-nachteile"},{key:"ap",cls:"num"}],{name:"",ap:""});
+function apNum(x){ const m=String(x==null?"":x).match(/-?\d+/); return m?parseInt(m[0]):0; }
+function apSummen(){
+  const v=(C.vorteile||[]).reduce((a,r)=>a+apNum(r.ap),0), n=(C.nachteile||[]).reduce((a,r)=>a+apNum(r.ap),0);
+  const vs=document.getElementById("vsum"), ns=document.getElementById("nsum");
+  if(vs) vs.innerHTML = v ? `Summe: kostet <b style="color:var(--red)">−${v} AP</b>` : "";
+  if(ns) ns.innerHTML = n ? `Summe: bringt <b style="color:#3a7a2f">+${n} AP</b>` : "";
+}
+const renderVorteile = tableEditor("vorteile","vorteile",[{key:"name",list:"dl-vorteile"},{key:"ap",cls:"num"}],{name:"",ap:""}, apSummen);
+const renderNachteile = tableEditor("nachteile","nachteile",[{key:"name",list:"dl-nachteile"},{key:"ap",cls:"num"}],{name:"",ap:""}, apSummen);
+apSummen();
 mkDatalist("dl-vorteile",(DSA.VORTEILE||[]).map(v=>v.name));
 mkDatalist("dl-nachteile",(DSA.NACHTEILE||[]).map(v=>v.name));
 function addVN(arrName,render,kat,pickId){ const inp=document.getElementById(pickId), e=(kat||[]).find(x=>x.name===inp.value.trim()); if(!inp.value.trim())return; C[arrName].push(e?{name:e.name,ap:e.ap}:{name:inp.value.trim(),ap:""}); save(); render(); inp.value=""; }
-function addVorteil(){ addVN("vorteile",renderVorteile,DSA.VORTEILE,"vorteilpick"); }
-function addNachteil(){ addVN("nachteile",renderNachteile,DSA.NACHTEILE,"nachteilpick"); }
+function addVorteil(){ addVN("vorteile",renderVorteile,DSA.VORTEILE,"vorteilpick"); apSummen(); }
+function addNachteil(){ addVN("nachteile",renderNachteile,DSA.NACHTEILE,"nachteilpick"); apSummen(); }
 bindText("sonderf",()=>C.sonderf,v=>C.sonderf=v);
 
 // ───────── Zauber & Liturgien ─────────
@@ -936,12 +980,13 @@ function renderErschaffung(){
     if(mod.frei1) h+=`<div class="choice">Freie Steigerung (+1) auf: <select id="frei1"><option value="">– wählen –</option>${EIG.map(([k,v])=>`<option value="${k}"${C.create.frei1===k?' selected':''}>${v}</option>`).join('')}</select></div>`;
     if(mod.minus2) h+=`<div class="choice">Schwächung (−2) auf: <select id="minus2"><option value="">– wählen –</option>${mod.minus2.map(k=>`<option value="${k}"${C.create.minus2===k?' selected':''}>${NAME[k]}</option>`).join('')}</select></div>`;
   } else h+=`<div class="hint">Wähle oben im Kopf eine Spezies, dann werden ihre Änderungen verrechnet.</div>`;
-  h+=`<div class="plbl" style="margin-top:8px;font-size:11px;font-weight:500;color:var(--dim);text-transform:uppercase;letter-spacing:.04em">Eigenschaften verteilen (Startwert 8)</div>`;
+  h+=`<div class="plbl" style="margin-top:8px;font-size:11px;font-weight:500;color:var(--dim);text-transform:uppercase;letter-spacing:.04em">Eigenschaften verteilen <span style="text-transform:none;font-weight:400">— gekauft (kostet AP) + Bonus (Spezies/frei, kostenlos) = Endwert</span></div>`;
   h+=EIG.map(([k,voll])=>{
-    const p=C.create.purchased[k]||8, over=p>g.max;
+    const p=C.create.purchased[k]||8, over=p>g.max, bonus=(fin[k]??p)-p;
+    const bTxt = bonus ? `<span class="ebonus">${bonus>0?'+':''}${bonus}</span>` : `<span class="ebonus" style="visibility:hidden">+0</span>`;
     return `<div class="erow"><span class="en">${voll}</span>
       <button data-em="${k}" data-d="-1">−</button><span class="pv ${over?'bad':''}">${p}</span><button data-em="${k}" data-d="1">+</button>
-      <span class="fin">→ ${fin[k]}</span><span class="ap">${eigAPfor(p)} AP</span></div>`;
+      ${bTxt}<span class="fin">= ${fin[k]}</span><span class="ap">${eigAPfor(p)} AP</span></div>`;
   }).join('');
   h+=`<div class="konto" style="margin-top:8px">
         <span class="kpos">Eigenschafts-Summe: <b class="${sumP>g.summe?'bad':''}">${sumP}</b> / ${g.summe}</span>
@@ -992,7 +1037,7 @@ function renderAll(){
   renderTalente(); renderTechniken(); renderZustaende();
   renderSprachen(); renderSchriften(); renderNah(); renderFern(); renderRuestung(); renderSchild();
   renderInv(); renderGewicht();
-  renderVorteile(); renderNachteile(); renderZauber(); renderLiturgien();
+  renderVorteile(); renderNachteile(); apSummen(); renderZauber(); renderLiturgien();
   renderErschaffung();
 }
 
