@@ -1850,7 +1850,7 @@ function renderTalentSelect(){
 }
 renderTalentSelect();
 const vsel=document.getElementById("variante");
-vsel.onchange=()=>{ C.variante=vsel.value; save(); };
+vsel.onchange=()=>{ C.variante=vsel.value; save(); renderPaketVorschau(); };
 function varianteLabel(name){
   const v=(DSA.VARIANTEN||{})[name]; if(!v) return name;
   const fmt=arr=>(arr||[]).map(t=>`${t.name} ${t.value>0?"+":""}${t.value}`).join(", ");
