@@ -1852,11 +1852,9 @@ function renderTalentSelect(){
 renderTalentSelect();
 const vsel=document.getElementById("variante");
 vsel.onchange=()=>{ C.variante=vsel.value; save(); renderPaketVorschau(); };
-function varianteLabel(name){
+function varianteLabel(name){   // nur Name + AP-Differenz; die genauen Änderungen stehen in der Paket-Vorschau
   const v=(DSA.VARIANTEN||{})[name]; if(!v) return name;
-  const fmt=arr=>(arr||[]).map(t=>`${t.name} ${t.value>0?"+":""}${t.value}`).join(", ");
-  const d=[fmt(v.talente), fmt(v.kampftechniken)].filter(Boolean).join(", ");
-  return name + (v.cost!=null?` (${v.cost} AP)`:"") + (d?`: ${d}`:"");  // Name + AP + was die Variante ändert
+  return name + (v.cost!=null?` (${v.cost>0?"+":""}${v.cost} AP)`:"");
 }
 function renderVariante(){
   const wrap=document.getElementById("variante-wrap"), prof=(DSA.PROFESSIONEN||{})[C.profession], vars=(prof&&prof.varianten)||[];
@@ -1872,23 +1870,25 @@ renderVariante();
 function renderPaketVorschau(){
   const box=document.getElementById("paketvorschau"); if(!box) return;
   const cult=kulturDaten(C.kultur), prof=(DSA.PROFESSIONEN||{})[C.profession];
-  if(!cult && !prof){ box.innerHTML=""; return; }
+  if(!C.spezies && !cult && !prof){ box.innerHTML=""; return; }
   const tl=arr=>(arr||[]).map(t=>`${t.name}${t.value!=null?` +${t.value}`:""}`).join(", ");
+  const ap=n=> n===0 ? `<span style="color:var(--dim)">gratis</span>` : `<b>${n>0?'':''}${n} AP</b>`;
   let h="";
-  if(cult) h+=`<div><b>Kultur ${esc(C.kultur)}</b>: `+(cult.paket&&cult.paket.length?tl(cult.paket):"keine Start-Talente")+`</div>`;
+  if(C.spezies) h+=`<div><b>Spezies ${esc(C.spezies)}</b> (${ap(SPEZ_AP[C.spezies]||0)}): Auto-Vorteile ${SPEZ_AUTO[C.spezies]||'—'}</div>`;
+  if(cult) h+=`<div style="margin-top:3px"><b>Kultur ${esc(C.kultur)}</b> (${ap(0)}): `+(cult.paket&&cult.paket.length?tl(cult.paket):"keine Start-Talente")+`</div>`;
   if(prof){
     const parts=[];
     if(prof.talente&&prof.talente.length) parts.push("Talente: "+tl(prof.talente));
     if(prof.kampftechniken&&prof.kampftechniken.length) parts.push("Kampftechniken: "+tl(prof.kampftechniken));
     if(prof.zauber&&prof.zauber.length) parts.push("Zauber: "+prof.zauber.map(t=>t.name).join(", "));
-    h+=`<div style="margin-top:3px"><b>Profession ${esc(C.profession)}</b>: `+(parts.length?parts.join(" · "):"—")+`</div>`;
+    h+=`<div style="margin-top:3px"><b>Profession ${esc(C.profession)}</b> (${ap(prof.cost||0)}): `+(parts.length?parts.join(" · "):"—")+`</div>`;
   }
   const vari=(DSA.VARIANTEN||{})[C.variante];
   if(vari && (vari.talente.length || vari.kampftechniken.length)){
     const vt=[...vari.talente.map(t=>`${t.name} ${t.value>0?'+':''}${t.value}`), ...vari.kampftechniken.map(t=>`${t.name} ${t.value>0?'+':''}${t.value}`)].join(", ");
-    h+=`<div style="margin-top:3px;color:var(--red)"><b>Variante ${esc(C.variante)}</b> ändert: ${vt}</div>`;
+    h+=`<div style="margin-top:3px;color:var(--red)"><b>Variante ${esc(C.variante)}</b> (${vari.cost!=null?ap(vari.cost):'0 AP'}) ändert: ${vt}</div>`;
   }
-  box.innerHTML=`<div class="vorschau"><div class="vorschau-h">Das trägt „Paket anwenden" ein:</div>${h}</div>`;
+  box.innerHTML=`<div class="vorschau"><div class="vorschau-h">Das bekommst du – und was es kostet:</div>${h}</div>`;
 }
 function paketAnwenden(){
   const cult=kulturDaten(C.kultur), prof=(DSA.PROFESSIONEN||{})[C.profession], vari=(DSA.VARIANTEN||{})[C.variante], sums={};
@@ -2125,7 +2125,8 @@ function renderErschaffung(){
   const sp=C.spezies, mod=SPEZ_MOD[sp], fin=finalEig();
   let sumP=0, apEig=0;
   EIG.forEach(([k])=>{ const p=C.create.purchased[k]||8; sumP+=p; apEig+=eigAPfor(p); });
-  const apSpez=SPEZ_AP[sp]||0, apTalente=talenteAPgesamt(), uebrig=g.ap-apSpez-apEig-apTalente;
+  const apProf=((DSA.PROFESSIONEN||{})[C.profession]||{}).cost||0, apVari=((DSA.VARIANTEN||{})[C.variante]||{}).cost||0;
+  const apSpez=SPEZ_AP[sp]||0, apTalente=talenteAPgesamt(), uebrig=g.ap-apSpez-apProf-apVari-apEig-apTalente;
   const fixTxt = (sp&&mod) ? Object.entries(mod.fix).map(([k,v])=>`${NAME[k]} ${v>0?'+':''}${v}`).join(', ') : '';
   let h='';
   h+=`<div class="choice">Erfahrungsgrad:
@@ -2134,10 +2135,12 @@ function renderErschaffung(){
   h+=`<div class="konto">
         <span class="kpos">Budget: <b>${g.ap}</b></span>
         <span class="kpos">− Spezies (${sp||'—'}): ${apSpez}</span>
+        <span class="kpos">− Profession (${C.profession||'—'}): ${apProf}${apVari?` ${apVari>0?'+':''}${apVari} Variante`:''}</span>
+        <span class="kpos" style="color:var(--dim)">Kultur (${C.kultur||'—'}): gratis</span>
         <span class="kpos">− Eigenschaften: ${apEig}</span>
-        <span class="kpos">− Talente: ${apTalente}</span>
+        <span class="kpos">− Talent-Steigerungen: ${apTalente}</span>
         <span class="kpos">= übrig: <b class="${uebrig<0?'bad':''}">${uebrig}</b> AP</span></div>`;
-  h+=`<div class="hint">Talente über dem gratis Kultur-/Professionspaket sind verrechnet. Kampftechniken, Zauber/Liturgien, Vor-/Nachteile und Sonderfertigkeiten kommen noch dazu.</div>`;
+  h+=`<div class="hint">Spezies + Professionspaket + Eigenschaften + Talent-Steigerungen über dem Paket sind verrechnet (Kultur ist gratis). Noch nicht im Topf: Kampftechnik-Steigerungen, Zauber/Liturgien, Vor-/Nachteile, Sonderfertigkeiten.</div>`;
   if(sp){
     h+=`<div class="choice"><b>${sp}</b>${fixTxt?` — ${fixTxt}`:''} · Spezies-Vorteile: ${SPEZ_AUTO[sp]||'—'}</div>`;
     if(mod.frei1) h+=`<div class="choice">Freie Steigerung (+1) auf: <select id="frei1"><option value="">– wählen –</option>${EIG.map(([k,v])=>`<option value="${k}"${C.create.frei1===k?' selected':''}>${v}</option>`).join('')}</select></div>`;
