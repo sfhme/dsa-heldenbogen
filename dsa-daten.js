@@ -15441,7 +15441,7 @@ window.DSADATEN = {
       ]
     },
     "Prostituierter": {
-      "cost": 204,
+      "cost": 203,
       "gr": 1,
       "sgr": 1,
       "rassenReq": null,
@@ -16220,7 +16220,7 @@ window.DSADATEN = {
       ]
     },
     "Wildnisläufer": {
-      "cost": 267,
+      "cost": 256,
       "gr": 2,
       "sgr": 3,
       "rassenReq": "Elf",
@@ -16329,7 +16329,7 @@ window.DSADATEN = {
       ]
     },
     "Zauberweber": {
-      "cost": 236,
+      "cost": 221,
       "gr": 2,
       "sgr": 3,
       "rassenReq": "Elf",
@@ -18240,7 +18240,7 @@ window.DSADATEN = {
       ]
     },
     "Adersin-Schwertgeselle": {
-      "cost": 397,
+      "cost": 379,
       "gr": 1,
       "sgr": 2,
       "rassenReq": null,
@@ -19357,7 +19357,7 @@ window.DSADATEN = {
       ]
     },
     "Elenviner Krieger": {
-      "cost": 284,
+      "cost": 299,
       "gr": 1,
       "sgr": 2,
       "rassenReq": null,
@@ -22505,7 +22505,7 @@ window.DSADATEN = {
       ]
     },
     "Majuna": {
-      "cost": 291,
+      "cost": 311,
       "gr": 2,
       "sgr": 7,
       "rassenReq": null,
@@ -24358,7 +24358,7 @@ window.DSADATEN = {
       ]
     },
     "Efferdgeweihter": {
-      "cost": 345,
+      "cost": 381,
       "gr": 3,
       "sgr": 1,
       "rassenReq": null,
@@ -25133,7 +25133,7 @@ window.DSADATEN = {
       ]
     },
     "Rahjageweihter": {
-      "cost": 341,
+      "cost": 303,
       "gr": 3,
       "sgr": 1,
       "rassenReq": null,
@@ -26003,7 +26003,7 @@ window.DSADATEN = {
       ]
     },
     "Swafnirgeweihter": {
-      "cost": 286,
+      "cost": 296,
       "gr": 3,
       "sgr": 2,
       "rassenReq": null,
@@ -30928,7 +30928,7 @@ window.DSADATEN = {
       ]
     },
     "Albernischer Seefahrer": {
-      "cost": 195,
+      "cost": 200,
       "gr": 1,
       "sgr": 1,
       "rassenReq": null,
@@ -31037,7 +31037,7 @@ window.DSADATEN = {
       "vorteile": []
     },
     "Küstenschmuggler aus Havena": {
-      "cost": 279,
+      "cost": 287,
       "gr": 1,
       "sgr": 1,
       "rassenReq": null,
@@ -31169,7 +31169,7 @@ window.DSADATEN = {
       "vorteile": []
     },
     "Schatzsucher der Siebenwindküste": {
-      "cost": 304,
+      "cost": 319,
       "gr": 1,
       "sgr": 1,
       "rassenReq": null,
@@ -33199,7 +33199,7 @@ window.DSADATEN = {
       ]
     },
     "Schaukämpfer": {
-      "cost": 268,
+      "cost": 159,
       "gr": 1,
       "sgr": 2,
       "rassenReq": null,
@@ -35788,7 +35788,7 @@ window.DSADATEN = {
       ]
     },
     "Levthanpriester": {
-      "cost": 293,
+      "cost": 319,
       "gr": 3,
       "sgr": 1,
       "rassenReq": null,
@@ -36110,7 +36110,7 @@ window.DSADATEN = {
       ]
     },
     "Säbeltänzer": {
-      "cost": 291,
+      "cost": 306,
       "gr": 3,
       "sgr": 3,
       "rassenReq": null,
@@ -37346,7 +37346,7 @@ window.DSADATEN = {
       ]
     },
     "Konzildruide": {
-      "cost": 286,
+      "cost": 283,
       "gr": 2,
       "sgr": 4,
       "rassenReq": null,
@@ -38693,7 +38693,7 @@ window.DSADATEN = {
       ]
     },
     "Ferdoker Lanzer": {
-      "cost": 274,
+      "cost": 301,
       "gr": 1,
       "sgr": 2,
       "rassenReq": null,
@@ -38841,7 +38841,7 @@ window.DSADATEN = {
       ]
     },
     "Klippag-Schwertgeselle": {
-      "cost": 364,
+      "cost": 376,
       "gr": 1,
       "sgr": 2,
       "rassenReq": null,
@@ -38994,7 +38994,7 @@ window.DSADATEN = {
       ]
     },
     "Koscher Almgreve": {
-      "cost": 273,
+      "cost": 278,
       "gr": 1,
       "sgr": 1,
       "rassenReq": null,
@@ -39144,7 +39144,7 @@ window.DSADATEN = {
       ]
     },
     "Rechtsgelehrter": {
-      "cost": 171,
+      "cost": 207,
       "gr": 1,
       "sgr": 1,
       "rassenReq": null,
@@ -39242,7 +39242,7 @@ window.DSADATEN = {
       ]
     },
     "Wandergeselle": {
-      "cost": 202,
+      "cost": 194,
       "gr": 1,
       "sgr": 1,
       "rassenReq": null,
@@ -39389,7 +39389,7 @@ window.DSADATEN = {
       ]
     },
     "Xorloscher Drachenkämpfer": {
-      "cost": 383,
+      "cost": 393,
       "gr": 1,
       "sgr": 2,
       "rassenReq": "Zwerg",
@@ -39527,7 +39527,7 @@ window.DSADATEN = {
       ]
     },
     "Gratenfelser Haindruide": {
-      "cost": 361,
+      "cost": 371,
       "gr": 2,
       "sgr": 4,
       "rassenReq": null,
