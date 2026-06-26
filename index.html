@@ -1851,13 +1851,19 @@ function renderTalentSelect(){
 renderTalentSelect();
 const vsel=document.getElementById("variante");
 vsel.onchange=()=>{ C.variante=vsel.value; save(); };
+function varianteLabel(name){
+  const v=(DSA.VARIANTEN||{})[name]; if(!v) return name;
+  const fmt=arr=>(arr||[]).map(t=>`${t.name} ${t.value>0?"+":""}${t.value}`).join(", ");
+  const d=[fmt(v.talente), fmt(v.kampftechniken)].filter(Boolean).join(", ");
+  return name + (v.cost!=null?` (${v.cost} AP)`:"") + (d?`: ${d}`:"");  // Name + AP + was die Variante ändert
+}
 function renderVariante(){
   const wrap=document.getElementById("variante-wrap"), prof=(DSA.PROFESSIONEN||{})[C.profession], vars=(prof&&prof.varianten)||[];
   if(!vars.length){ wrap.style.display="none"; vsel.innerHTML=""; return; }
   const pflicht = !!(prof&&prof.variantePflicht);   // greift nur, weil hier schon Varianten existieren
   wrap.style.display="";
-  const lab=document.getElementById("variante-lab"); if(lab) lab.textContent = pflicht?"Variante (Pflicht)":"Variante (optional)";
-  vsel.innerHTML = (pflicht?"":'<option value="">– keine –</option>')+vars.map(v=>`<option${C.variante===v?" selected":""}>${v}</option>`).join("");
+  const lab=document.getElementById("variante-lab"); if(lab) lab.textContent = pflicht?"Variante (Pflicht) – Unterschied steht jeweils dabei":"Variante (optional) – Unterschied steht jeweils dabei";
+  vsel.innerHTML = (pflicht?"":'<option value="">– keine –</option>')+vars.map(v=>`<option value="${esc(v)}"${C.variante===v?" selected":""}>${esc(varianteLabel(v))}</option>`).join("");
   if(pflicht && !C.variante){ C.variante=vars[0]; vsel.value=vars[0]; save(); }
   renderPaketVorschau();
 }
