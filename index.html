@@ -442,6 +442,7 @@
             <th title="Kulturpaket-AP minus Spezies-AP">Kult±</th>
             <th title="Professionspaket-AP minus Professions-Kosten">Prof±</th>
             <th title="Kult± + Prof±">Σ</th>
+            <th title="Kulturpaket-AP die sich mit Profession-Talenten überschneiden">Syn</th>
             <th></th>
           </tr></thead>
           <tbody id="rk-tbody"></tbody>
@@ -463,7 +464,7 @@
 const DSA = window.DSADATEN || {};
 const LORE = window.DSALORE || {spezies:{},kulturen:{},professionen:{}};
 // Anzeigename -> Optolith-Schlüssel, wo meine Kulturliste und Optolith abweichen
-const KULT_ALIAS = {"Waldmenschen":"Mohas","Utulus":"Mohas"};
+const KULT_ALIAS = {"Mohas":"Waldmenschen"};
 const kulturDaten = c => (DSA.KULTUREN||{})[KULT_ALIAS[c]||c];
 // ───────── Daten ─────────
 const TALENTE = {
@@ -542,7 +543,7 @@ const SPEZIES = {
   "Elf":{lep:2,sk:-4,zk:-6,gs:8},    "Zwerg":{lep:8,sk:-4,zk:-4,gs:6}
 };
 const KULTUREN = {
-  "Mensch":["Andergaster","Aranier","Bornländer","Engasaler","Ferkina","Fjarninger","Gjalsker","Horasier","Koboldweltler","Maraskaner","Mhanadistani","Mittelreicher","Mohas","Nivesen","Norbarden","Nordaventurier","Nostrier","Novadis","Svellttaler","Südaventurier","Thorwaler","Trollzacker","Utulus","Waldmenschen","Zahori","Zyklopäer"],
+  "Mensch":["Andergaster","Aranier","Bornländer","Engasaler","Ferkina","Fjarninger","Gjalsker","Horasier","Koboldweltler","Maraskaner","Mhanadistani","Mittelreicher","Nivesen","Norbarden","Nordaventurier","Nostrier","Novadis","Svellttaler","Südaventurier","Thorwaler","Trollzacker","Utulus","Waldmenschen","Zahori","Zyklopäer"],
   "Halbelf":["Andergaster","Auelfen","Bornländer","Firnelfen","Horasier","Mittelreicher","Nivesen","Nordaventurier","Nostrier","Svellttaler","Thorwaler","Waldelfen"],
   "Elf":["Auelfen","Firnelfen","Steppenelfen","Waldelfen"],
   "Zwerg":["Ambosszwerge","Brillantzwerge","Erzzwerge","Hügelzwerge","Wildzwerge"]
@@ -599,7 +600,9 @@ if(EXOTEN.SPEZIES){
   Object.assign(SPEZ_MOD, EXOTEN.SPEZ_MOD||{});
   Object.assign(SPEZ_AUTO, EXOTEN.SPEZ_AUTO||{});
   Object.assign(KULTUREN, EXOTEN.SPEZ_KULT||{});            // Spezies -> übliche Kulturen
-  Object.assign(DSA.KULTUREN, EXOTEN.KULTUREN||{});          // neue Kulturdaten (social/Professionen)
+  for(const [k,v] of Object.entries(EXOTEN.KULTUREN||{})){   // neue Kulturdaten (social/Professionen) — per-Kultur mergen, um paket aus dsa-daten.js zu erhalten
+    if(DSA.KULTUREN[k]) Object.assign(DSA.KULTUREN[k],v); else DSA.KULTUREN[k]=v;
+  }
   Object.assign(DSA.PROFESSIONEN, EXOTEN.PROFESSIONEN||{});  // exotische Professionen (Echsenreiter, Achazschamane …)
   (EXOTEN.EXTRA_KULT_MENSCH||[]).forEach(k=>{ if(KULTUREN.Mensch && KULTUREN.Mensch.indexOf(k)<0) KULTUREN.Mensch.push(k); });
 }
@@ -1389,6 +1392,13 @@ function _besteVar(pname){
   return [bestV,bestNet];
 }
 
+function _synergie(kname,pname){
+  const kd=(DSA.KULTUREN||{})[kname]; if(!kd) return 0;
+  const p=(DSA.PROFESSIONEN||{})[pname]; if(!p) return 0;
+  const profTal=new Set((p.talente||[]).filter(t=>t.name).map(t=>t.name));
+  return (kd.paket||[]).reduce((s,t)=>t.name&&profTal.has(t.name)?s+_apW((DSA.TALENT_SF||{})[t.name]||'B',t.value||0):s,0);
+}
+
 let _rkCache=null, _rkLoading=false, _rkLimit=100, _rkLastFilter='';
 function _buildRanking(){
   if(_rkCache) return _rkCache;
@@ -1403,7 +1413,8 @@ function _buildRanking(){
         if(p.cost==null) continue;
         if(p.rassenReq && p.rassenReq!==spez) continue;
         const [vname,pNet]=_besteVar(pname);
-        rows.push({total:kNet+pNet,spez,kname,pname,vname,kNet,pNet,typisch:allTyp.has(pname),gr:p.gr});
+        const syn=_synergie(kname,pname);
+        rows.push({total:kNet+pNet,spez,kname,pname,vname,kNet,pNet,syn,typisch:allTyp.has(pname),gr:p.gr});
       }
     }
   }
@@ -1424,7 +1435,7 @@ function renderRanking(){
   if(!_rkCache){
     if(!_rkLoading){
       _rkLoading=true;
-      tbody.innerHTML='<tr><td colspan="9" style="padding:20px;text-align:center;color:var(--dim)">Berechne …</td></tr>';
+      tbody.innerHTML='<tr><td colspan="10" style="padding:20px;text-align:center;color:var(--dim)">Berechne …</td></tr>';
       setTimeout(()=>{ _buildRanking(); _rkLoading=false; renderRanking(); }, 20);
     }
     return;
@@ -1452,9 +1463,10 @@ function renderRanking(){
     <td class="rk-net ${r.kNet>=0?'rk-pos':'rk-neg'}">${r.kNet>=0?'+':''}${r.kNet}</td>
     <td class="rk-net ${r.pNet>=0?'rk-pos':'rk-neg'}">${r.pNet>=0?'+':''}${r.pNet}</td>
     <td class="rk-tot ${r.total>=0?'rk-pos':'rk-neg'}">${r.total>=0?'+':''}${r.total}</td>
+    <td class="rk-net">${r.syn>0?r.syn:''}</td>
     <td><button class="rk-apply" onclick="rkApply(${i})">→ Bogen</button></td>
   </tr>`).join('')
-  +(rows.length>MAX?`<tr><td colspan="9" style="text-align:center;padding:8px"><button onclick="_rkLimit+=100;renderRanking()" style="font-size:13px;padding:4px 14px">Weitere 100 laden (${rows.length-MAX} verbleiben)</button></td></tr>`:'');
+  +(rows.length>MAX?`<tr><td colspan="10" style="text-align:center;padding:8px"><button onclick="_rkLimit+=100;renderRanking()" style="font-size:13px;padding:4px 14px">Weitere 100 laden (${rows.length-MAX} verbleiben)</button></td></tr>`:'');
   tbody.querySelectorAll('tr[data-i]').forEach(tr=>tr.onclick=e=>{
     if(e.target.classList.contains('rk-apply')) return;
     tbody.querySelectorAll('tr').forEach(r=>r.style.background='');
