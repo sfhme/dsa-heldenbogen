@@ -159,10 +159,11 @@
         <select id="spezies"><option value="">– wählen –</option></select>
       </label>
       <label>Kultur / Herkunft<select id="kultur"><option value="">– erst Spezies wählen –</option></select></label>
-      <label>Profession / Beruf<select id="profession"><option value="">– wählen –</option></select></label>
+      <label>Profession / Beruf<select id="profession"><option value="">– wählen –</option></select>
+        <span id="proffilter-wrap" style="display:none;font-size:11px;color:var(--dim);margin-top:3px"><label style="font-weight:normal;display:inline-flex;align-items:center;gap:4px;margin:0"><input type="checkbox" id="profAlle" style="width:auto;margin:0"> auch untypische Professionen zeigen</label></span></label>
       <label id="variante-wrap" style="display:none"><span id="variante-lab">Variante</span><select id="variante"></select></label>
     </div>
-    <label style="display:flex;align-items:center;gap:6px;font-weight:normal;font-size:12px;color:var(--dim);margin:6px 0 0"><input type="checkbox" id="regelfrei" style="width:auto;margin:0"> Mit Spielleiter-Freigabe: Erweiterungs-Spezies (Achaz, Goblin, Ork, Halbork), artfremde Kulturen &amp; gesperrte/untypische Professionen anzeigen</label>
+    <label style="display:flex;align-items:center;gap:6px;font-weight:normal;font-size:12px;color:var(--dim);margin:6px 0 0"><input type="checkbox" id="regelfrei" style="width:auto;margin:0"> Mit Spielleiter-Freigabe: Erweiterungs-Spezies (Achaz, Goblin, Ork, Halbork) &amp; artfremde Kulturen anzeigen</label>
     <div class="felder" id="persdaten"></div>
     <button class="acc" id="aussehenbtn" type="button" onclick="aussehenVorschlag()" style="margin-top:6px;font-size:12px;width:auto">Aussehen würfeln (Größe, Gewicht, Haar- &amp; Augenfarbe nach Spezies/Kultur)</button>
     <label style="display:block;margin-top:8px">Notizen / Hintergrund <span style="font-weight:normal;color:var(--dim);font-size:11px">(für dich – und Kurt liest sie als Spielleiter mit)</span><textarea id="notizen" rows="2" placeholder="Backstory, Ziele, Geheimnisse, Beziehungen …" style="width:100%;resize:vertical;font:inherit;padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:#fffdf4;color:var(--ink)"></textarea></label>
@@ -1570,7 +1571,7 @@ const eigAPfor = p => { let s=0; for(let v=9;v<=p;v++) s+=eigPunktKosten(v); ret
 const DEFAULT = { name:"",
   persdaten:{familie:"",geburtsort:"",alter:"",groesse:"",gewicht:"",haarfarbe:"",augenfarbe:"",titel:"",sozialstatus:""},
   notizen:"",
-  spezies:"", kultur:"", profession:"", variante:"", regelfrei:false,
+  spezies:"", kultur:"", profession:"", variante:"", regelfrei:false, profAlle:false,
   eig:{MU:12,KL:12,IN:12,CH:12,FF:12,GE:12,KO:12,KK:12},
   lep:{akt:30,max:30}, asp:{akt:0,max:0}, kap:{akt:0,max:0}, schicksal:{akt:3,max:3},
   vorteile:[], nachteile:[], sonderf:"",
@@ -1698,7 +1699,8 @@ function renderProfessionen(){
   const pr=DSA.PROFESSIONEN||{}, GRL={1:"Weltliche Professionen",2:"Zaubererprofessionen",3:"Geweihtenprofessionen"};
   const kult=kulturDaten(C.kultur);
   const typ = kult ? new Set([...(kult.profWeltlich||[]),...(kult.profMagisch||[]),...(kult.profGeweiht||[])]) : null;
-  const showAll = !typ || C.regelfrei;   // Haken „Regeln ignorieren" zeigt alle Professionen
+  const wrap=document.getElementById("proffilter-wrap"); if(wrap) wrap.style.display = typ ? "" : "none";
+  const showAll = !typ || C.profAlle;    // eigener Haken „auch untypische Professionen" – unabhängig von der SL-Freigabe
   const istTyp=n=> typ && typ.has(n);
   const add=(label,arr)=>{ if(!arr.length) return; const og=document.createElement("optgroup"); og.label=label;
     arr.sort((a,b)=> (istTyp(b)?1:0)-(istTyp(a)?1:0) || a.localeCompare(b))   // typische zuerst
@@ -1720,6 +1722,8 @@ kult.onchange=()=>{ C.kultur=kult.value; renderProfessionen(); renderTalentSelec
 prof.onchange=()=>{ C.profession=prof.value; C.variante=""; save(); renderVariante(); renderTalentSelect(); renderTalente(); renderLore(); };
 const regelfreiChk=document.getElementById("regelfrei");
 if(regelfreiChk){ regelfreiChk.checked=!!C.regelfrei; regelfreiChk.onchange=()=>{ C.regelfrei=regelfreiChk.checked; save(); renderSpezies(); renderKulturen(); renderLore(); }; }
+const profAlleChk=document.getElementById("profAlle");
+if(profAlleChk){ profAlleChk.checked=!!C.profAlle; profAlleChk.onchange=()=>{ C.profAlle=profAlleChk.checked; save(); renderProfessionen(); }; }
 // Hintergrund-Beschreibungen (Wiki Aventurica) zu Spezies/Kultur/Profession
 function loreURL(lemma){ return "https://de.wiki-aventurica.de/wiki/"+encodeURIComponent((lemma||"").replace(/ /g,"_")); }
 function renderLore(){
@@ -2170,6 +2174,7 @@ function renderAll(){
   document.querySelectorAll('#persdaten input[data-pd]').forEach(i=> i.value = C.persdaten[i.dataset.pd]||"");
   { const nz=document.getElementById('notizen'); if(nz) nz.value = C.notizen||""; }
   { const rf=document.getElementById('regelfrei'); if(rf) rf.checked = !!C.regelfrei; }
+  { const pa=document.getElementById('profAlle'); if(pa) pa.checked = !!C.profAlle; }
   renderSozialstatus();
   document.querySelectorAll('#eig input[data-eig]').forEach(i=> i.value = C.eig[i.dataset.eig]);
   renderSpezies();
