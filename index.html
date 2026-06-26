@@ -621,9 +621,10 @@ pdBox.querySelectorAll("input[data-pd]").forEach(i=>i.oninput=()=>{ C.persdaten[
 function renderSozialstatus(){
   const sel=document.getElementById("sozialstatus-sel"); if(!sel) return;
   const kd=kulturDaten(C.kultur);
-  let opts=(kd && Array.isArray(kd.social) && kd.social.length) ? kd.social.slice() : ["Unfrei","Frei","Niederadel","Adel","Hochadel"];
+  const opts=(kd && Array.isArray(kd.social) && kd.social.length) ? kd.social.slice() : ["Unfrei","Frei","Niederadel","Adel","Hochadel"];
+  // Stand hängt an der Kultur: ist der gewählte Stand für diese Kultur nicht erlaubt, wird er geleert (kein regelwidriger Charakter)
+  if(C.persdaten.sozialstatus && opts.indexOf(C.persdaten.sozialstatus)<0) C.persdaten.sozialstatus="";
   const cur=C.persdaten.sozialstatus||"";
-  if(cur && opts.indexOf(cur)<0) opts=[cur,...opts];   // bereits gewählten Wert nie verlieren
   sel.innerHTML='<option value="">– wählen –</option>'+opts.map(o=>`<option${o===cur?" selected":""}>${esc(o)}</option>`).join("");
   sel.value=cur;
 }
@@ -684,8 +685,8 @@ function renderProfessionen(){
   if(cur){ if(![...prof.options].some(o=>o.value===cur)){ const o=document.createElement("option"); o.value=cur; o.textContent=cur; prof.appendChild(o); } prof.value=cur; }
   renderPaketVorschau();
 }
-spezSel.onchange=()=>{ C.spezies=spezSel.value; C.kultur=""; C.profession=""; C.variante=""; save(); renderKulturen(); renderDerived(); renderErschaffung(); renderTalentSelect(); renderTalente(); renderLore(); renderSozialstatus(); };
-kult.onchange=()=>{ C.kultur=kult.value; save(); renderProfessionen(); renderTalentSelect(); renderTalente(); renderLore(); renderSozialstatus(); };
+spezSel.onchange=()=>{ C.spezies=spezSel.value; C.kultur=""; C.profession=""; C.variante=""; renderKulturen(); renderDerived(); renderErschaffung(); renderTalentSelect(); renderTalente(); renderLore(); renderSozialstatus(); save(); };
+kult.onchange=()=>{ C.kultur=kult.value; renderProfessionen(); renderTalentSelect(); renderTalente(); renderLore(); renderSozialstatus(); save(); };
 prof.onchange=()=>{ C.profession=prof.value; C.variante=""; save(); renderVariante(); renderTalentSelect(); renderTalente(); renderLore(); };
 const profAlleChk=document.getElementById("profAlle"); if(profAlleChk) profAlleChk.onchange=renderProfessionen;
 // Hintergrund-Beschreibungen (Wiki Aventurica) zu Spezies/Kultur/Profession
