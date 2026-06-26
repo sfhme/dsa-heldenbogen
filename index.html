@@ -1677,11 +1677,17 @@ renderSpezies();
 const kult=document.getElementById("kultur"), prof=document.getElementById("profession");
 function renderKulturen(){
   const cur=C.kultur, own=KULTUREN[C.spezies]||[];
-  const list = C.regelfrei ? [...new Set(Object.values(KULTUREN).flat())].sort() : own;  // mit Haken: alle Kulturen
   kult.innerHTML="";
-  const p=document.createElement("option"); p.value=""; p.textContent=list.length?"– wählen –":"– erst Spezies wählen –"; kult.appendChild(p);
-  list.forEach(n=>{ const o=document.createElement("option"); o.value=n; o.textContent=(C.regelfrei && own.includes(n))?n+"  ✓ typisch":n; kult.appendChild(o); });
-  if(cur){ if(!list.includes(cur)){ const o=document.createElement("option"); o.value=cur; o.textContent=cur; kult.appendChild(o); } kult.value=cur; }
+  const ph=document.createElement("option"); ph.value=""; ph.textContent=(own.length||C.regelfrei)?"– wählen –":"– erst Spezies wählen –"; kult.appendChild(ph);
+  const grp=(label,arr)=>{ if(!arr.length) return; const og=document.createElement("optgroup"); og.label=label;
+    arr.forEach(n=>{ const o=document.createElement("option"); o.value=n; o.textContent=n; og.appendChild(o); }); kult.appendChild(og); };
+  grp(C.spezies?`Typisch für ${C.spezies}`:"Kulturen", own);
+  if(C.regelfrei){   // mit Freigabe: artfremde Kulturen separat, damit die typischen oben klar bleiben
+    const fremd=[...new Set(Object.values(KULTUREN).flat())].filter(n=>own.indexOf(n)<0).sort();
+    grp("Artfremd (Spielleiter-Freigabe)", fremd);
+  }
+  if(cur && ![...kult.options].some(o=>o.value===cur)){ const o=document.createElement("option"); o.value=cur; o.textContent=cur; kult.appendChild(o); }
+  kult.value=cur||"";
   renderProfessionen();
 }
 function weltlicheFuer(k){ if(!k) return WELTLICH; if(k.w.nur) return k.w.nur; return WELTLICH.filter(p=>!k.w.aus.includes(p)); }
@@ -1693,9 +1699,11 @@ function renderProfessionen(){
   const kult=kulturDaten(C.kultur);
   const typ = kult ? new Set([...(kult.profWeltlich||[]),...(kult.profMagisch||[]),...(kult.profGeweiht||[])]) : null;
   const showAll = !typ || C.regelfrei;   // Haken „Regeln ignorieren" zeigt alle Professionen
+  const istTyp=n=> typ && typ.has(n);
   const add=(label,arr)=>{ if(!arr.length) return; const og=document.createElement("optgroup"); og.label=label;
-    arr.sort().forEach(n=>{ const o=document.createElement("option"); o.value=n;
-      o.textContent = (showAll && typ && typ.has(n)) ? n+"  ✓ typisch" : n; og.appendChild(o); }); prof.appendChild(og); };
+    arr.sort((a,b)=> (istTyp(b)?1:0)-(istTyp(a)?1:0) || a.localeCompare(b))   // typische zuerst
+       .forEach(n=>{ const o=document.createElement("option"); o.value=n;
+      o.textContent = (showAll && istTyp(n)) ? n+"  ✓ typisch" : n; og.appendChild(o); }); prof.appendChild(og); };
   [1,2,3].forEach(g=>{
     let names=Object.keys(pr).filter(n=>pr[n].gr===g);
     if(!showAll) names=names.filter(n=>typ.has(n));
