@@ -1,0 +1,1480 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Heldendokument</title>
+<style>
+  :root{
+    --paper:#efe3c6; --paper2:#f6eed7; --ink:#2f2718; --dim:#7a6a4c;
+    --line:#c2a96f; --line2:#d9c79a; --red:#7c2c22; --gold:#9a7b2e;
+    --leben:#9c3b30; --astral:#3a5a99; --karma:#9a7b2e;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:#d2bf90;color:var(--ink);
+    font:16px/1.5 "Palatino Linotype","Book Antiqua",Georgia,serif;-webkit-text-size-adjust:100%}
+  .sheet{max-width:900px;margin:0 auto;padding:18px;
+    background:radial-gradient(120% 80% at 50% -8%, #f7f0db 0%, var(--paper) 55%, #e7d8b3 100%);
+    min-height:100vh;box-shadow:0 0 40px #0005;border-left:1px solid #00000022;border-right:1px solid #00000022}
+  h1,h2{font-weight:600}
+  h2{font-size:15px;letter-spacing:.14em;text-transform:uppercase;color:var(--red);
+    margin:22px 0 10px;padding-bottom:5px;border-bottom:2px solid var(--line);
+    display:flex;align-items:center;gap:8px}
+  h2::before{content:"";width:7px;height:7px;background:var(--red);transform:rotate(45deg);flex:none}
+  h3{font-size:13px;letter-spacing:.06em;color:var(--gold);text-transform:uppercase;margin:14px 0 4px}
+  .box{background:var(--paper2);border:1px solid var(--line);border-radius:6px;padding:14px;
+    box-shadow:inset 0 0 0 1px #fff7e1, 0 1px 2px #0001;margin-bottom:12px}
+  input,select,textarea{background:#fffdf4;border:1px solid var(--line);color:var(--ink);
+    border-radius:5px;padding:8px 10px;font:inherit}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--red)}
+  input[type=number]{-moz-appearance:textfield}
+  input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .name{font-size:26px;font-weight:600;width:100%;border:none;background:transparent;
+    color:var(--red);padding:2px 0;font-variant:small-caps;letter-spacing:.02em}
+  .meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+  .meta label{flex:1;min-width:150px;font-size:13px;color:var(--dim)}
+  .meta input,.meta select{display:block;width:100%;margin-top:3px}
+  .felder{display:grid;grid-template-columns:repeat(3,1fr);gap:8px 12px;margin-top:10px}
+  .felder label{font-size:12px;color:var(--dim)} .felder input{display:block;width:100%;margin-top:2px}
+  @media(max-width:560px){.felder{grid-template-columns:repeat(2,1fr)}}
+
+  /* Reiter / Seiten */
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0 0}
+  .tabs button{background:#e7d6ad;border:1px solid var(--line);border-bottom:none;
+    border-radius:8px 8px 0 0;padding:9px 13px;font-variant:small-caps;letter-spacing:.04em;font-size:14.5px}
+  .tabs button.active{background:var(--paper2);color:var(--red);font-weight:600;box-shadow:0 -3px 0 var(--red) inset}
+  .page{display:none;border-top:2px solid var(--line);padding-top:4px}
+  .page.active{display:block}
+
+  .eig{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .eig .b{text-align:center}
+  .eig .b .lab{font-size:13px;color:var(--dim);height:2.6em;display:flex;align-items:flex-end;justify-content:center;line-height:1.2}
+  .eig .b .val{margin-top:6px;width:60px;height:60px;border-radius:50%;border:2px solid var(--line);
+    background:#fffdf4;font-size:24px;font-weight:600;text-align:center;color:var(--ink);
+    margin-inline:auto;display:block;box-shadow:inset 0 0 0 3px #fff,0 1px 2px #0002}
+  @media(max-width:560px){.eig{grid-template-columns:repeat(2,1fr)}}
+
+  .energy{display:flex;align-items:center;gap:12px;margin:10px 0}
+  .energy .lab{width:130px;font-weight:600}
+  .energy .lab small{display:block;font-weight:400;font-size:11px;color:var(--dim)}
+  .track{flex:1;height:26px;background:#e7d6ad;border:1px solid var(--line);border-radius:5px;overflow:hidden;position:relative;min-width:110px}
+  .track>span{display:block;height:100%;transition:width .15s;opacity:.85}
+  .track b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#2c2008}
+  .stepper button{width:32px;height:30px;margin-left:5px}
+  .mx{width:54px;text-align:center}
+  .eig .b .eigstep{display:flex;align-items:center;justify-content:center;gap:5px;margin-top:6px}
+  .eig .b .eigstep .val{margin-top:0}
+  .eigbtn{width:26px;height:30px;padding:0;font-size:17px;line-height:1;cursor:pointer;border-radius:5px;flex:none;background:#fffdf4;border:1px solid var(--line);color:var(--ink)}
+  .eigbtn:hover{background:#f3e4bd}
+  .ebonus{color:var(--gold);font-weight:600;min-width:24px;text-align:right}
+  td.derv{font-weight:700;color:var(--ink);background:#faf4e2}
+  .talente-sum{background:#faf4e2;border:1px solid var(--line2);border-radius:6px;padding:6px 10px;margin-bottom:8px;font-size:13px}
+  .lorebox{margin:0 0 6px}
+  .lore-h{font-variant:small-caps;letter-spacing:.5px;color:var(--dim);font-size:12px;margin:4px 0 2px}
+  details.lore{background:var(--paper2);border:1px solid var(--line2);border-radius:6px;padding:5px 10px;margin:4px 0}
+  details.lore summary{cursor:pointer;color:var(--ink);font-size:13px;list-style-position:inside}
+  details.lore .loretext{margin-top:6px;font-size:13px;line-height:1.55;color:var(--ink)}
+  details.lore .loretext a{color:var(--red);white-space:nowrap;font-weight:600}
+  .apsum{font-size:12px;color:var(--dim);margin:2px 0 4px}
+  .vorschau{background:var(--paper2);border:1px solid var(--line2);border-radius:5px;padding:8px 10px;font-size:13px;margin-bottom:10px}
+  .vorschau-h{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--gold);margin-bottom:3px}
+  .mxlab{display:flex;flex-direction:column;align-items:center;font-size:10px;color:var(--dim);gap:1px}
+
+  .derived{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .derived .d{background:#fffdf4;border:1px solid var(--line);border-radius:6px;padding:9px 11px;text-align:center}
+  .derived .d .dl{font-size:12.5px;color:var(--dim)}
+  .derived .d .dv{font-size:22px;font-weight:600;color:var(--ink);margin-top:2px}
+  .derived .d small{display:block;font-size:11px;color:var(--dim);font-style:italic}
+  .derived .d button{margin-top:5px;padding:3px 8px;font-size:12px}
+  @media(max-width:560px){.derived{grid-template-columns:repeat(2,1fr)}}
+  .konto{display:flex;flex-wrap:wrap;gap:10px;font-size:14px;margin:10px 0;align-items:center}
+  .konto .kpos{background:#fffdf4;border:1px solid var(--line);border-radius:6px;padding:6px 10px}
+  .konto b{color:var(--red)} .bad{color:#b3261e;font-weight:700}
+  .choice{margin:9px 0;font-size:14px}
+  .erow{display:flex;align-items:center;gap:9px;padding:6px 0;border-top:1px solid var(--line2)}
+  .erow .en{flex:1;min-width:120px;font-weight:600}
+  .erow button{width:30px;height:28px} .erow .pv{width:34px;text-align:center;font-weight:600;font-size:17px}
+  .erow .fin{font-size:14px;color:var(--red);width:54px} .erow .ap{font-size:12px;color:var(--dim);width:64px;text-align:right}
+
+  button{cursor:pointer;background:#f3e7c4;border:1px solid var(--line);color:var(--ink);
+    border-radius:5px;padding:8px 12px;font:inherit}
+  button:hover{border-color:var(--red);background:#f7eecb}
+  button:active{transform:translateY(1px)}
+  button.acc{background:var(--red);color:#f6eed7;border-color:#5e1f17;font-weight:600}
+  button.acc:hover{background:#8d352a}
+
+  .dice{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .out{margin-top:12px;min-height:22px;font-size:16px}
+  .tag{display:inline-block;padding:2px 9px;border-radius:4px;font-size:13px;font-weight:700;font-variant:small-caps;letter-spacing:.03em}
+  .tag.g{background:#23401f;color:#bfe0a8} .tag.b{background:#4a1c17;color:#e6b0a8}
+
+  .add{display:flex;gap:8px;flex-wrap:wrap}.add select{flex:1;min-width:200px}
+  .hint{color:var(--dim);font-size:13px;font-style:italic;margin-top:6px}
+  .tz{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:9px 0;border-top:1px solid var(--line2)}
+  .tz .nm{flex:1;min-width:160px}
+  .tz .le{display:block;font-size:12px;color:var(--dim)}
+  .tz .field{font-size:12px;color:var(--dim)} .tz .field input{width:50px;text-align:center;margin-left:3px}
+  .tz .res{flex-basis:100%;font-size:14px;color:var(--ink)}
+  .x{color:var(--dim);border:none;background:none;padding:4px 7px;font-size:16px}
+
+  table{width:100%;border-collapse:collapse;margin-top:6px}
+  th,td{border:1px solid var(--line2);padding:4px 6px;text-align:left;font-size:13.5px;vertical-align:middle}
+  th{background:#e9d9b2;color:var(--red);font-variant:small-caps;letter-spacing:.02em;font-weight:600}
+  td input{width:100%;border:none;background:transparent;padding:4px}
+  td input:focus{background:#fffdf4;border-radius:3px}
+  td.num{width:58px} td.num input{text-align:center}
+  td.act{width:30px;text-align:center}
+  .tblwrap{overflow-x:auto}
+  .geld{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
+  .geld label{font-size:13px;color:var(--dim)} .geld input{display:block;width:90px;text-align:center;margin-top:3px}
+  textarea{width:100%;min-height:120px;resize:vertical;line-height:1.6}
+  .twosub{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:560px){.twosub{grid-template-columns:1fr}}
+  .zust{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+  .zust .zr{display:flex;align-items:center;gap:8px;background:#fffdf4;border:1px solid var(--line);border-radius:6px;padding:6px 9px}
+  .zust .zr .zn{flex:1;font-size:14px} .zust .zr .zv{width:20px;text-align:center;font-weight:600}
+  @media(max-width:560px){.zust{grid-template-columns:1fr}}
+  .schmerz{font-size:14px;margin-top:8px}
+  .meta3{display:flex;gap:12px;flex-wrap:wrap} .meta3 label{font-size:12px;color:var(--dim);flex:1;min-width:140px} .meta3 input{display:block;width:100%;margin-top:2px}
+  body.viewing input, body.viewing select, body.viewing textarea, body.viewing button{ pointer-events:none; opacity:.9; }
+  body.viewing #tischbox input, body.viewing #tischbox button, body.viewing #tabs button{ pointer-events:auto; opacity:1; }
+  #viewbanner{ flex-basis:100%; display:flex; flex-wrap:wrap; align-items:center; gap:10px; background:#f3e4bd; border:1px solid var(--gold); border-radius:5px; padding:6px 10px; font-size:13px; }
+
+  /* Rangliste */
+  .rk-filter{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+  .rk-label{font-size:13px;color:var(--dim);display:flex;align-items:center;gap:4px;white-space:nowrap}
+  .rk-count{font-size:12px;color:var(--dim);margin-bottom:6px}
+  #rk-table td{padding:3px 6px;font-size:13px}
+  .rk-rg{color:var(--dim);text-align:right;width:36px;font-size:12px}
+  .rk-gr{color:var(--dim);font-size:11px;white-space:nowrap}
+  .rk-var{color:var(--dim);font-size:11px}
+  .rk-net,.rk-tot{text-align:right;width:54px;font-variant-numeric:tabular-nums}
+  .rk-tot{font-weight:700;width:62px}
+  .rk-pos{color:#6a7e2f} .rk-neg{color:var(--red)}
+  .rk-typ{background:#fcfaec}
+  .rk-apply{padding:2px 7px;font-size:12px}
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <div class="box" id="tischbox" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px">
+    <strong style="color:var(--red);letter-spacing:.06em;font-size:13px">SPIELTISCH</strong>
+    <input id="tischcode" placeholder="Tisch-Code (z.B. drachenei)" style="flex:1;min-width:150px">
+    <button class="acc" id="tischbtn" onclick="tischToggle()">beitreten</button>
+    <span id="tischstatus" style="font-size:12px;color:var(--dim)">nicht verbunden (nur lokal)</span>
+    <div id="party" style="flex-basis:100%;display:flex;flex-wrap:wrap;gap:6px"></div>
+    <div id="viewbanner" style="display:none"><b>Du siehst <span id="viewname"></span>s Bogen</b> <span style="color:var(--dim)">— nur ansehen</span> <button class="acc" onclick="viewMyself()">← zurück zu meinem Bogen</button></div>
+  </div>
+
+  <div class="box">
+    <input class="name" id="name" placeholder="Heldenname">
+    <div class="meta">
+      <label>Spezies / Volk
+        <select id="spezies"><option value="">– wählen –</option></select>
+      </label>
+      <label>Kultur / Herkunft<select id="kultur"><option value="">– erst Spezies wählen –</option></select></label>
+      <label>Profession / Beruf<select id="profession"><option value="">– wählen –</option></select>
+        <span id="proffilter-wrap" style="display:none;font-size:11px;color:var(--dim);margin-top:3px"><label style="font-weight:normal;display:inline-flex;align-items:center;gap:4px;margin:0"><input type="checkbox" id="profAlle" style="width:auto;margin:0"> auch untypische Professionen zeigen</label></span></label>
+      <label id="variante-wrap" style="display:none"><span id="variante-lab">Variante</span><select id="variante"></select></label>
+    </div>
+    <label style="display:flex;align-items:center;gap:6px;font-weight:normal;font-size:12px;color:var(--dim);margin:6px 0 0"><input type="checkbox" id="regelfrei" style="width:auto;margin:0"> Mit Spielleiter-Freigabe: Erweiterungs-Spezies (Achaz, Goblin, Ork, Halbork) &amp; artfremde Kulturen anzeigen</label>
+    <div class="felder" id="persdaten"></div>
+    <button class="acc" id="aussehenbtn" type="button" onclick="aussehenVorschlag()" style="margin-top:6px;font-size:12px;width:auto">Aussehen würfeln (Größe, Gewicht, Haar- &amp; Augenfarbe nach Spezies/Kultur)</button>
+    <label style="display:block;margin-top:8px">Notizen / Hintergrund <span style="font-weight:normal;color:var(--dim);font-size:11px">(für dich – und Kurt liest sie als Spielleiter mit)</span><textarea id="notizen" rows="2" placeholder="Backstory, Ziele, Geheimnisse, Beziehungen …" style="width:100%;resize:vertical;font:inherit;padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:#fffdf4;color:var(--ink)"></textarea></label>
+  </div>
+
+  <div id="lorebox" class="lorebox"></div>
+
+  <div class="tabs" id="tabs">
+    <button data-p="erschaffung">Heldenerschaffung</button>
+    <button data-p="0" class="active">Eigenschaften &amp; Werte</button>
+    <button data-p="1">Talente</button>
+    <button data-p="2">Kampf</button>
+    <button data-p="3">Besitz</button>
+    <button data-p="5">Zauber</button>
+    <button data-p="6">Liturgien</button>
+    <button data-p="rangliste">Rangliste</button>
+  </div>
+
+  <!-- Seite 1: Eigenschaften & Werte -->
+  <section class="page active" data-page="0">
+    <h2>Eigenschaften</h2>
+    <div class="box"><div class="eig" id="eig"></div></div>
+
+    <h2>Energien</h2>
+    <div class="box" id="energie"></div>
+
+    <h2>Abgeleitete Werte</h2>
+    <div class="box">
+      <div class="derived" id="derived"></div>
+      <div class="hint">Werden automatisch aus deinen Eigenschaften und deiner Spezies berechnet.</div>
+    </div>
+
+    <h2>Vorteile, Nachteile &amp; Sonderfertigkeiten</h2>
+    <div class="box">
+      <div class="twosub">
+        <div><h3>Vorteile</h3>
+          <div class="add"><input id="vorteilpick" list="dl-vorteile" placeholder="Vorteil suchen …" style="flex:1;min-width:140px"><button class="acc" onclick="addVorteil()">+</button></div>
+          <div class="tblwrap"><table><thead><tr><th>Vorteil</th><th>AP (kostet)</th><th></th></tr></thead><tbody id="vorteile"></tbody></table></div>
+          <div class="apsum" id="vsum"></div>
+        </div>
+        <div><h3>Nachteile</h3>
+          <div class="add"><input id="nachteilpick" list="dl-nachteile" placeholder="Nachteil suchen …" style="flex:1;min-width:140px"><button class="acc" onclick="addNachteil()">+</button></div>
+          <div class="tblwrap"><table><thead><tr><th>Nachteil</th><th>AP (bringt)</th><th></th></tr></thead><tbody id="nachteile"></tbody></table></div>
+          <div class="apsum" id="nsum"></div>
+        </div>
+      </div>
+      <h3>Allgemeine Sonderfertigkeiten</h3>
+      <textarea id="sonderf" placeholder="erlernte Sonderfertigkeiten …"></textarea>
+    </div>
+  </section>
+
+  <!-- Seite 2: Talente -->
+  <section class="page" data-page="1">
+    <h2>Würfeltisch</h2>
+    <div class="box">
+      <div class="dice">
+        <button onclick="wurf('1W20')">1 × W20</button>
+        <button onclick="wurf('3W20')">3 × W20</button>
+        <button onclick="wurf('1W6')">1 × W6</button>
+        <button onclick="wurf('2W6')">2 × W6</button>
+        <input id="freidice" placeholder="frei, z.B. 2W6+4" style="width:140px">
+        <button onclick="wurf(document.getElementById('freidice').value)">werfen</button>
+      </div>
+      <div class="out" id="diceout"></div>
+    </div>
+
+    <h2>Talente &amp; Proben</h2>
+    <div class="box">
+      <div class="add">
+        <select id="talsel"></select>
+        <button class="acc" onclick="addTalent()">zum Bogen hinzufügen</button>
+      </div>
+      <div class="hint">Eine Probe wirft drei zwanzigseitige Würfel gegen die drei zugehörigen Eigenschaften. Was über den Eigenschaftswert hinausgeht, bezahlst du mit dem Fertigkeitswert. „Erschwernis" trägst du als Minuszahl ein.</div>
+      <div id="meinetalente"></div>
+    </div>
+
+    <h2>Sprachen &amp; Schriften</h2>
+    <div class="box twosub">
+      <div>
+        <h3>Sprachen</h3>
+        <div class="tblwrap"><table><thead><tr><th>Sprache</th><th>Komplexität</th><th></th></tr></thead><tbody id="sprachen"></tbody></table></div>
+        <button onclick="add_sprachen()" style="margin-top:8px">+ Sprache</button>
+      </div>
+      <div>
+        <h3>Schriften</h3>
+        <div class="tblwrap"><table><thead><tr><th>Schrift</th><th>Komplexität</th><th></th></tr></thead><tbody id="schriften"></tbody></table></div>
+        <button onclick="add_schriften()" style="margin-top:8px">+ Schrift</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Seite 3: Kampf -->
+  <section class="page" data-page="2">
+    <h2>Kampftechniken</h2>
+    <div class="box">
+      <div class="tblwrap"><table>
+        <thead><tr><th>Kampftechnik</th><th>Kampftechnikwert</th><th>Attacke</th><th>Parade / Fernkampf</th></tr></thead>
+        <tbody id="techniken"></tbody>
+      </table></div>
+      <div class="hint">Attacke, Parade und Fernkampf werden automatisch aus dem Kampftechnikwert und der Leiteigenschaft berechnet (AT = KtW + Bonus aus Mut, PA = halber KtW + Bonus aus Leiteigenschaft, FK = KtW + Bonus aus Fingerfertigkeit; Bonus = +1 je 3 volle Punkte über 8). Waffenspezifische Modifikatoren stehen bei den Waffen.</div>
+    </div>
+
+    <h2>Nahkampfwaffen</h2>
+    <div class="box">
+      <div class="add"><input id="nahwaffenpick" list="dl-nahwaffen" placeholder="Nahkampfwaffe aus dem Regelwerk …" style="flex:1;min-width:220px"><button class="acc" onclick="addNahwaffe()">aus Liste hinzufügen</button></div>
+      <div class="tblwrap"><table>
+        <thead><tr><th>Waffe</th><th>Kampftechnik</th><th>Trefferpunkte</th><th>AT/PA-Mod</th><th>Reichweite</th><th>Attacke</th><th>Parade</th><th></th></tr></thead>
+        <tbody id="nahwaffen"></tbody>
+      </table></div>
+      <button onclick="add_nahwaffen()" style="margin-top:8px">+ leere Zeile</button>
+    </div>
+
+    <h2>Fernkampfwaffen</h2>
+    <div class="box">
+      <div class="add"><input id="fernwaffenpick" list="dl-fernwaffen" placeholder="Fernkampfwaffe aus dem Regelwerk …" style="flex:1;min-width:220px"><button class="acc" onclick="addFernwaffe()">aus Liste hinzufügen</button></div>
+      <div class="tblwrap"><table>
+        <thead><tr><th>Waffe</th><th>Kampftechnik</th><th>Ladezeit</th><th>Trefferpunkte</th><th>Reichweite</th><th>Fernkampf</th><th></th></tr></thead>
+        <tbody id="fernwaffen"></tbody>
+      </table></div>
+      <button onclick="add_fernwaffen()" style="margin-top:8px">+ leere Zeile</button>
+    </div>
+
+    <h2>Rüstung &amp; Schild</h2>
+    <div class="box twosub">
+      <div>
+        <h3>Rüstungen</h3>
+        <div class="add"><input id="ruestungpick" list="dl-ruestungen" placeholder="Rüstung aus dem Regelwerk …" style="flex:1;min-width:150px"><button class="acc" onclick="addRuestung()">aus Liste</button></div>
+        <div class="tblwrap"><table><thead><tr><th>Rüstung</th><th>Schutz</th><th>Belastung</th><th>Gewicht</th><th></th></tr></thead><tbody id="ruestung"></tbody></table></div>
+        <button onclick="add_ruestung()" style="margin-top:8px">+ leere Zeile</button>
+      </div>
+      <div>
+        <h3>Schild / Parierwaffe</h3>
+        <div class="add"><input id="schildpick" list="dl-schilde" placeholder="Schild aus dem Regelwerk …" style="flex:1;min-width:150px"><button class="acc" onclick="addSchild()">aus Liste</button></div>
+        <div class="tblwrap"><table><thead><tr><th>Name</th><th>AT/PA-Mod</th><th>Gewicht</th><th></th></tr></thead><tbody id="schild"></tbody></table></div>
+        <button onclick="add_schild()" style="margin-top:8px">+ leere Zeile</button>
+      </div>
+    </div>
+
+    <h2>Zustände</h2>
+    <div class="box">
+      <div class="zust" id="zustaende"></div>
+      <div class="schmerz" id="schmerzauto"></div>
+      <h3>Kampfsonderfertigkeiten</h3>
+      <textarea id="ksf" placeholder="z.B. Wuchtschlag, Finte, Ausfall …" style="min-height:90px"></textarea>
+    </div>
+  </section>
+
+  <!-- Seite 4: Besitz -->
+  <section class="page" data-page="3">
+    <h2>Ausrüstung</h2>
+    <div class="box">
+      <div class="tblwrap"><table>
+        <thead><tr><th>Gegenstand</th><th>Anzahl</th><th>Gewicht (Stein)</th><th>getragen / verstaut</th><th></th></tr></thead>
+        <tbody id="inventar"></tbody>
+      </table></div>
+      <button onclick="add_inventar()" style="margin-top:8px">+ Gegenstand</button>
+      <div class="konto" style="margin-top:10px">
+        <span class="kpos">Gesamtgewicht: <b id="gesamtgewicht">0</b> Stein</span>
+        <span class="kpos">Tragkraft: <input type="number" id="tragkraft" style="width:64px;text-align:center"> Stein</span>
+      </div>
+    </div>
+
+    <h2>Geldbeutel</h2>
+    <div class="box">
+      <div class="geld">
+        <label>Dukaten<input type="number" data-geld="d"></label>
+        <label>Silbertaler<input type="number" data-geld="s"></label>
+        <label>Heller<input type="number" data-geld="h"></label>
+        <label>Kreuzer<input type="number" data-geld="k"></label>
+      </div>
+      <div class="hint">1 Dukat = 10 Silbertaler = 100 Heller = 1000 Kreuzer.</div>
+      <h3>Edelsteine, Schmuck &amp; Sonstiges</h3>
+      <textarea id="edelsteine" placeholder="Wertgegenstände …" style="min-height:80px"></textarea>
+    </div>
+
+    <h2>Vertrautes / Tier</h2>
+    <div class="box"><textarea id="tier" placeholder="Begleittier oder Vertrautes: Werte, Größe, Angriff, Sonderfertigkeiten …" style="min-height:90px"></textarea></div>
+
+    <h2>Notizen</h2>
+    <div class="box"><textarea id="notizen" placeholder="Hintergrund, Aussehen, Bekanntschaften, Erlebnisse …"></textarea></div>
+  </section>
+
+  <!-- Seite 5: Zauber & Rituale -->
+  <section class="page" data-page="5">
+    <h2>Zauber &amp; Rituale</h2>
+    <div class="box">
+      <div class="meta3">
+        <label>Leiteigenschaft<input id="magie-leiteig" placeholder="z.B. Klugheit"></label>
+        <label>Tradition<input id="magie-tradition" placeholder="z.B. Gildenmagier, Hexen"></label>
+        <label>Astralpunkte (auf Seite 1)<input value="trackst du bei den Energien" disabled style="font-style:italic;color:var(--dim)"></label>
+      </div>
+      <div class="add"><input id="zauberpick" list="dl-zauber" placeholder="Zauber aus dem Regelwerk suchen …" style="flex:1;min-width:220px"><button class="acc" onclick="addZauberAusListe()">aus Liste hinzufügen</button></div>
+      <div class="tblwrap" style="margin-top:10px"><table>
+        <thead><tr><th>Zauber / Ritual</th><th>Probe</th><th>FW</th><th>Kosten</th><th>Reichweite</th><th>Wirkungsdauer</th><th>Wirkung</th><th></th></tr></thead>
+        <tbody id="zauber"></tbody>
+      </table></div>
+      <button onclick="add_zauber()" style="margin-top:8px">+ leere Zeile</button>
+      <div class="hint">Magier und Hexen tragen hier ihre Zauber ein. Probe-Format z.B. „Klugheit / Intuition / Fingerfertigkeit". Eine geführte Zauber-Auswahl aus dem Regelwerk kommt als nächster Schritt.</div>
+    </div>
+  </section>
+
+  <!-- Seite 6: Liturgien & Zeremonien -->
+  <section class="page" data-page="6">
+    <h2>Liturgien &amp; Zeremonien</h2>
+    <div class="box">
+      <div class="meta3">
+        <label>Leiteigenschaft<input id="karma-leiteig" placeholder="z.B. Mut"></label>
+        <label>Tradition<input id="karma-tradition" placeholder="z.B. Kirche des Praios"></label>
+        <label>Karmapunkte (auf Seite 1)<input value="trackst du bei den Energien" disabled style="font-style:italic;color:var(--dim)"></label>
+      </div>
+      <div class="add"><input id="liturgiepick" list="dl-liturgien" placeholder="Liturgie aus dem Regelwerk suchen …" style="flex:1;min-width:220px"><button class="acc" onclick="addLiturgieAusListe()">aus Liste hinzufügen</button></div>
+      <div class="tblwrap" style="margin-top:10px"><table>
+        <thead><tr><th>Liturgie / Zeremonie</th><th>Probe</th><th>FW</th><th>Kosten</th><th>Reichweite</th><th>Wirkungsdauer</th><th>Wirkung</th><th></th></tr></thead>
+        <tbody id="liturgien"></tbody>
+      </table></div>
+      <button onclick="add_liturgien()" style="margin-top:8px">+ leere Zeile</button>
+      <div class="hint">Geweihte tragen hier ihre Liturgien ein. Eine geführte Auswahl aus dem Regelwerk kommt als nächster Schritt.</div>
+    </div>
+  </section>
+
+  <!-- Heldenerschaffung -->
+  <section class="page" data-page="erschaffung">
+    <h2>Heldenerschaffung</h2>
+    <div class="box" style="border-color:#a8741a">
+      <h3 style="margin-top:0">Fertigen Helden laden</h3>
+      <div class="hint" style="margin-top:0">Die sechs vorgefertigten Helden aus den DSA-Schnellstartregeln — füllt den kompletten Bogen (Eigenschaften, Energien, Talente, Kampftechniken, Zauber, Vor-/Nachteile). Überschreibt den aktuellen Bogen.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px">
+        <select id="pregensel" style="flex:1;min-width:220px"></select>
+        <button class="acc" onclick="ladePregenAusSelect()">Held laden</button>
+      </div>
+    </div>
+    <div class="box">
+      <div class="hint" style="margin-top:0">Wähle oben im Kopf Spezies, Kultur und Profession. Hier verteilst du die Eigenschaften regelgenau nach Erfahrungsgrad. Alles ist nur ein Vorschlag — du kannst jeden Wert auf dem Bogen frei überschreiben.</div>
+      <div id="paketvorschau"></div>
+      <button class="acc" onclick="paketAnwenden()" style="margin-bottom:10px">Kultur- &amp; Professionspaket anwenden → Start-Talente &amp; Kampftechniken eintragen</button>
+      <div id="erschaffung"></div>
+    </div>
+  </section>
+
+  <!-- Rangliste -->
+  <section class="page" data-page="rangliste">
+    <h2>AP-Effizienz-Rangliste</h2>
+    <div class="box">
+      <div class="hint" style="margin-top:0">Alle gültigen Kombinationen aus Spezies · Kultur · Profession (beste Variante) nach Netto-AP sortiert. <b>Netto</b> = Wert des Pakets (Talente, Kampftechniken, Zauber, SF) − AP-Kosten. Höherer Wert = du bekommst mehr für dein Geld.</div>
+      <div class="rk-filter">
+        <select id="rk-spez" onchange="renderRanking()"><option value="">Alle Spezies</option><option>Mensch</option><option>Halbelf</option><option>Elf</option><option>Zwerg</option></select>
+        <select id="rk-gr" onchange="renderRanking()"><option value="0">Alle Gruppen</option><option value="1">Weltlich</option><option value="2">Magisch</option><option value="3">Geweiht</option></select>
+        <label class="rk-label"><input type="checkbox" id="rk-typ" onchange="renderRanking()"> nur Typische</label>
+        <input id="rk-suche" placeholder="Suche Kultur, Profession …" style="flex:1;min-width:160px" oninput="renderRanking()">
+        <button onclick="rkAuswahlUebernehmen()" id="rk-uebernehmen" style="display:none" class="acc">→ Auswahl in Bogen</button>
+      </div>
+      <div id="rk-count" class="rk-count"></div>
+      <div class="tblwrap">
+        <table id="rk-table">
+          <thead><tr>
+            <th class="rk-rg">#</th>
+            <th>Spezies</th>
+            <th>Kultur</th>
+            <th>Profession [Variante]</th>
+            <th>Gr.</th>
+            <th title="Kulturpaket-AP minus Spezies-AP">Kult±</th>
+            <th title="Professionspaket-AP minus Professions-Kosten">Prof±</th>
+            <th title="Kult± + Prof±">Σ</th>
+            <th></th>
+          </tr></thead>
+          <tbody id="rk-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <p class="hint">Alles wird in deinem Browser gespeichert. Nächste Schritte: geführte Zauber-/Liturgienauswahl, Kultur-/Professionspakete in der Erschaffung, Geräte-Sync und Kurt-Anbindung.</p>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+<script src="dsa-daten.js"></script>
+<script src="dsa-pregens.js"></script>
+<script src="dsa-lore.js"></script>
+<script src="dsa-exoten.js"></script>
+<script>
+const DSA = window.DSADATEN || {};
+const LORE = window.DSALORE || {spezies:{},kulturen:{},professionen:{}};
+// Anzeigename -> Optolith-Schlüssel, wo meine Kulturliste und Optolith abweichen
+const KULT_ALIAS = {"Waldmenschen":"Mohas","Utulus":"Mohas"};
+const kulturDaten = c => (DSA.KULTUREN||{})[KULT_ALIAS[c]||c];
+// ───────── Daten ─────────
+const TALENTE = {
+  "Bekehren & Überzeugen":{probe:["MU","KL","CH"],kat:"Gesellschaftstalente"},
+  "Betören":{probe:["MU","CH","CH"],kat:"Gesellschaftstalente"},
+  "Einschüchtern":{probe:["MU","IN","CH"],kat:"Gesellschaftstalente"},
+  "Etikette":{probe:["KL","IN","CH"],kat:"Gesellschaftstalente"},
+  "Gassenwissen":{probe:["KL","IN","CH"],kat:"Gesellschaftstalente"},
+  "Menschenkenntnis":{probe:["KL","IN","CH"],kat:"Gesellschaftstalente"},
+  "Überreden":{probe:["MU","IN","CH"],kat:"Gesellschaftstalente"},
+  "Verkleiden":{probe:["IN","CH","GE"],kat:"Gesellschaftstalente"},
+  "Willenskraft":{probe:["MU","IN","CH"],kat:"Gesellschaftstalente"},
+  "Fährtensuchen":{probe:["MU","IN","GE"],kat:"Naturtalente"},
+  "Fesseln":{probe:["KL","FF","KK"],kat:"Naturtalente"},
+  "Fischen & Angeln":{probe:["FF","GE","KO"],kat:"Naturtalente"},
+  "Orientierung":{probe:["KL","IN","IN"],kat:"Naturtalente"},
+  "Pflanzenkunde":{probe:["KL","FF","KO"],kat:"Naturtalente"},
+  "Tierkunde":{probe:["MU","MU","CH"],kat:"Naturtalente"},
+  "Wildnisleben":{probe:["MU","GE","KO"],kat:"Naturtalente"},
+  "Brett- & Glücksspiel":{probe:["KL","KL","IN"],kat:"Wissenstalente"},
+  "Geographie":{probe:["KL","KL","IN"],kat:"Wissenstalente"},
+  "Geschichtswissen":{probe:["KL","KL","IN"],kat:"Wissenstalente"},
+  "Götter & Kulte":{probe:["KL","KL","IN"],kat:"Wissenstalente"},
+  "Kriegskunst":{probe:["MU","KL","IN"],kat:"Wissenstalente"},
+  "Magiekunde":{probe:["KL","KL","IN"],kat:"Wissenstalente"},
+  "Mechanik":{probe:["KL","KL","FF"],kat:"Wissenstalente"},
+  "Rechnen":{probe:["KL","KL","IN"],kat:"Wissenstalente"},
+  "Rechtskunde":{probe:["KL","KL","IN"],kat:"Wissenstalente"},
+  "Sagen & Legenden":{probe:["KL","KL","IN"],kat:"Wissenstalente"},
+  "Sphärenkunde":{probe:["KL","KL","IN"],kat:"Wissenstalente"},
+  "Sternkunde":{probe:["KL","KL","IN"],kat:"Wissenstalente"},
+  "Alchimie":{probe:["MU","KL","FF"],kat:"Handwerkstalente"},
+  "Boote & Schiffe":{probe:["FF","GE","KK"],kat:"Handwerkstalente"},
+  "Fahrzeuge":{probe:["CH","FF","KO"],kat:"Handwerkstalente"},
+  "Handel":{probe:["KL","IN","CH"],kat:"Handwerkstalente"},
+  "Heilkunde Gift":{probe:["MU","KL","IN"],kat:"Handwerkstalente"},
+  "Heilkunde Krankheiten":{probe:["MU","IN","KO"],kat:"Handwerkstalente"},
+  "Heilkunde Seele":{probe:["IN","CH","KO"],kat:"Handwerkstalente"},
+  "Heilkunde Wunden":{probe:["KL","FF","FF"],kat:"Handwerkstalente"},
+  "Holzbearbeitung":{probe:["FF","GE","KK"],kat:"Handwerkstalente"},
+  "Lebensmittelbearbeitung":{probe:["IN","FF","FF"],kat:"Handwerkstalente"},
+  "Lederbearbeitung":{probe:["FF","GE","KO"],kat:"Handwerkstalente"},
+  "Malen & Zeichnen":{probe:["IN","FF","FF"],kat:"Handwerkstalente"},
+  "Metallbearbeitung":{probe:["FF","KO","KK"],kat:"Handwerkstalente"},
+  "Musizieren":{probe:["CH","FF","KO"],kat:"Handwerkstalente"},
+  "Schlösserknacken":{probe:["IN","FF","FF"],kat:"Handwerkstalente"},
+  "Steinbearbeitung":{probe:["FF","FF","KK"],kat:"Handwerkstalente"},
+  "Stoffbearbeitung":{probe:["KL","FF","FF"],kat:"Handwerkstalente"},
+  "Fliegen":{probe:["MU","IN","GE"],kat:"Körpertalente"},
+  "Gaukeleien":{probe:["MU","CH","FF"],kat:"Körpertalente"},
+  "Klettern":{probe:["MU","GE","KK"],kat:"Körpertalente"},
+  "Körperbeherrschung":{probe:["GE","GE","KO"],kat:"Körpertalente"},
+  "Kraftakt":{probe:["KO","KK","KK"],kat:"Körpertalente"},
+  "Reiten":{probe:["CH","GE","KK"],kat:"Körpertalente"},
+  "Schwimmen":{probe:["GE","KO","KK"],kat:"Körpertalente"},
+  "Selbstbeherrschung":{probe:["MU","MU","KO"],kat:"Körpertalente"},
+  "Singen":{probe:["KL","CH","KO"],kat:"Körpertalente"},
+  "Sinnesschärfe":{probe:["KL","IN","IN"],kat:"Körpertalente"},
+  "Tanzen":{probe:["KL","CH","GE"],kat:"Körpertalente"},
+  "Taschendiebstahl":{probe:["MU","FF","GE"],kat:"Körpertalente"},
+  "Verbergen":{probe:["MU","IN","GE"],kat:"Körpertalente"},
+  "Zechen":{probe:["KL","KO","KK"],kat:"Körpertalente"}
+};
+const EIG = [["MU","Mut"],["KL","Klugheit"],["IN","Intuition"],["CH","Charisma"],
+  ["FF","Fingerfertigkeit"],["GE","Gewandtheit"],["KO","Konstitution"],["KK","Körperkraft"]];
+const NAME = Object.fromEntries(EIG);
+const KAMPFTECHNIKEN = ["Armbrüste","Bögen","Dolche","Fechtwaffen","Hiebwaffen","Kettenwaffen","Raufen","Schilde","Schwerter","Stangenwaffen","Wurfwaffen","Zweihandhiebwaffen","Zweihandschwerter"];
+const ZUSTAENDE = ["Belastung","Betäubung","Entrückung","Furcht","Paralyse","Schmerz","Verwirrung"];
+// Aventurische Sprachen & Schriften (aus dem Regelwiki) + Sozialstatus
+const SPRACHEN = ["Adorunu","Alaani","Amuurak","Angram","Asdharia","Atak","Aureliani","Bosparano","Bukanisch","Drachisch","Ferkina","Fjarningsch","Garethi","Gjalskisch","Goblinisch","Golp","Grolmisch","Hummerisch","Isdira","Kemi","Koboldisch","Krakonisch","Mahrisch","Molochisch","Neckergesang","Nujuka","Ogrisch","Oloarkh","Ologhaijan","Rabensprache","Riesensprache","Rissoal","Rogolan","Ruuz","Saga-Thorwalsch","Tahaya","Thorwalsch","Tiefzwergisch","Trollisch","Tulamidya","Ur-Tulamidya","Yetan","Zelemja","Zhayad","Zhulchammaqra","Z'Lit","Zyklopäisch"];
+const SCHRIFTEN = ["Adorunu-Zeichen","Altes Alaani","Amulashtra-Glyphen","Angram-Bilderschrift","Arkanil","Chrmk","Chuchas","Drakhard-Zinke","Drakned-Glyphen","Geheiligte Glyphen von Unau","Gimaril","Gjalsker-Runen","Hjaldingsche Runen","Imperiale Zeichen","Isdira- und Asdharia-Zeichen","Kemi-Symbole","Kusliker Zeichen","Mahrische Glyphen","Nanduria-Zeichen","Rogolan-Runen","Thorwalsche Runen","Trollische Raumbilderschrift","Tulamidya-Zeichen","Ur-Tulamidya-Zeichen","Zhayad-Zeichen"];
+const SOZIALSTATUS = ["Unfrei","Frei","Niederadel","Adel","Hochadel"];
+// Spezies-Grundwerte (aus dem DSA5-Regelwiki verifiziert)
+const SPEZIES = {
+  "Mensch":{lep:5,sk:-5,zk:-5,gs:8}, "Halbelf":{lep:5,sk:-4,zk:-6,gs:8},
+  "Elf":{lep:2,sk:-4,zk:-6,gs:8},    "Zwerg":{lep:8,sk:-4,zk:-4,gs:6}
+};
+const KULTUREN = {
+  "Mensch":["Andergaster","Aranier","Bornländer","Engasaler","Ferkina","Fjarninger","Gjalsker","Horasier","Koboldweltler","Maraskaner","Mhanadistani","Mittelreicher","Mohas","Nivesen","Norbarden","Nordaventurier","Nostrier","Novadis","Svellttaler","Südaventurier","Thorwaler","Trollzacker","Utulus","Waldmenschen","Zahori","Zyklopäer"],
+  "Halbelf":["Andergaster","Auelfen","Bornländer","Firnelfen","Horasier","Mittelreicher","Nivesen","Nordaventurier","Nostrier","Svellttaler","Thorwaler","Waldelfen"],
+  "Elf":["Auelfen","Firnelfen","Steppenelfen","Waldelfen"],
+  "Zwerg":["Ambosszwerge","Brillantzwerge","Erzzwerge","Hügelzwerge","Wildzwerge"]
+};
+const WELTLICH = ["Adliger","Barde","Bauer","Gardist","Gaukler","Gelehrter","Gladiator","Händler","Heiler","Höfling","Jäger","Krieger","Künstler","Ritter","Schmied","Seefahrer","Soldat","Söldner","Stammeskrieger","Streuner","Wildnisläufer"];
+const G6=["Borongeweihte","Hesindegeweihte","Perainegeweihte","Phexgeweihte","Praiosgeweihte","Rondrageweihte"], HM=["Hexe","Magier"];
+const KULT = {
+  "Andergaster":{w:{aus:["Gladiator","Stammeskrieger"]},z:HM,g:G6},
+  "Aranier":{w:{aus:["Ritter","Gladiator","Stammeskrieger"]},z:HM,g:G6},
+  "Bornländer":{w:{aus:["Gladiator","Stammeskrieger"]},z:HM,g:G6},
+  "Fjarninger":{w:{nur:["Händler","Heiler","Jäger","Söldner","Stammeskrieger"]},z:[],g:[]},
+  "Horasier":{w:{aus:["Gladiator","Ritter","Stammeskrieger"]},z:HM,g:G6},
+  "Maraskaner":{w:{aus:["Gladiator","Ritter","Stammeskrieger"]},z:HM,g:[]},
+  "Mhanadistani":{w:{aus:["Ritter","Stammeskrieger"]},z:HM,g:G6},
+  "Mittelreicher":{w:{aus:["Stammeskrieger"]},z:HM,g:G6},
+  "Nivesen":{w:{nur:["Händler","Heiler","Jäger","Söldner","Stammeskrieger"]},z:[],g:[]},
+  "Norbarden":{w:{nur:["Händler","Heiler","Jäger","Söldner","Streuner"]},z:HM,g:["Hesindegeweihte","Phexgeweihte"]},
+  "Nordaventurier":{w:{aus:["Gladiator","Stammeskrieger"]},z:HM,g:G6},
+  "Nostrier":{w:{aus:["Gladiator","Stammeskrieger"]},z:HM,g:G6},
+  "Novadis":{w:{aus:["Gladiator","Ritter"]},z:["Magier"],g:[]},
+  "Svellttaler":{w:{aus:["Gladiator","Stammeskrieger"]},z:HM,g:G6},
+  "Südaventurier":{w:{aus:["Ritter","Stammeskrieger"]},z:HM,g:G6},
+  "Thorwaler":{w:{aus:["Gladiator","Ritter","Stammeskrieger"]},z:HM,g:[]},
+  "Utulus":{w:{nur:["Händler","Heiler","Jäger","Seefahrer","Stammeskrieger"]},z:[],g:[]},
+  "Waldmenschen":{w:{nur:["Händler","Heiler","Jäger","Söldner","Stammeskrieger"]},z:["Hexe"],g:[]},
+  "Zyklopäer":{w:{aus:["Ritter","Stammeskrieger"]},z:HM,g:G6},
+  "Auelfen":{w:{nur:["Wildnisläufer"]},z:["Zauberweber"],g:[]},
+  "Firnelfen":{w:{nur:["Wildnisläufer"]},z:["Zauberweber"],g:[]},
+  "Waldelfen":{w:{nur:["Wildnisläufer"]},z:["Zauberweber"],g:[]},
+  "Ambosszwerge":{w:{aus:["Gladiator","Ritter","Stammeskrieger"]},z:["Magier"],g:["Rondrageweihte"]},
+  "Brillantzwerge":{w:{aus:["Gladiator","Ritter","Stammeskrieger"]},z:["Magier"],g:["Hesindegeweihte","Phexgeweihte","Rondrageweihte"]},
+  "Erzzwerge":{w:{aus:["Gladiator","Ritter","Stammeskrieger"]},z:["Magier"],g:[]},
+  "Hügelzwerge":{w:{aus:["Gladiator","Ritter","Stammeskrieger"]},z:["Magier"],g:["Perainegeweihte"]}
+};
+const d = n => 1 + Math.floor(Math.random()*n);
+const esc = s => (s==null?"":String(s)).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;");
+// Heldenerschaffung — Werte aus dem Regelwiki, online verifiziert
+const GRADE = {
+  "Unerfahren":{ap:900,max:12,summe:95},"Durchschnittlich":{ap:1000,max:13,summe:98},
+  "Erfahren":{ap:1100,max:14,summe:100},"Kompetent":{ap:1200,max:15,summe:102},
+  "Meisterlich":{ap:1400,max:16,summe:105},"Brillant":{ap:1700,max:17,summe:109},"Legendär":{ap:2100,max:18,summe:114}
+};
+const SPEZ_AP = {Mensch:0,Halbelf:0,Elf:18,Zwerg:61};
+const SPEZ_MOD = {
+  "Mensch":{fix:{},frei1:true,minus2:null}, "Halbelf":{fix:{},frei1:true,minus2:null},
+  "Elf":{fix:{IN:1,GE:1},frei1:false,minus2:["KL","KK"]}, "Zwerg":{fix:{KO:1,KK:1},frei1:false,minus2:["CH","GE"]}
+};
+const SPEZ_AUTO = {Mensch:"—",Halbelf:"—",Elf:"Zauberer, Zweistimmiger Gesang",Zwerg:"Dunkelsicht I, Immunität gegen Tulmadron, Unfähig (Schwimmen)"};
+// Erweiterungs-Spezies (Achaz/Goblin/Ork/Halbork) + ihre Kulturen aus dsa-exoten.js dazumischen – nur hinter dem Regeln-ignorieren-Haken wählbar
+const EXOTEN = window.DSAEXOTEN || {};
+if(EXOTEN.SPEZIES){
+  Object.assign(SPEZIES, EXOTEN.SPEZIES);
+  Object.assign(SPEZ_AP, EXOTEN.SPEZ_AP||{});
+  Object.assign(SPEZ_MOD, EXOTEN.SPEZ_MOD||{});
+  Object.assign(SPEZ_AUTO, EXOTEN.SPEZ_AUTO||{});
+  Object.assign(KULTUREN, EXOTEN.SPEZ_KULT||{});            // Spezies -> übliche Kulturen
+  Object.assign(DSA.KULTUREN, EXOTEN.KULTUREN||{});          // neue Kulturdaten (social/Professionen)
+  Object.assign(DSA.PROFESSIONEN, EXOTEN.PROFESSIONEN||{});  // exotische Professionen (Echsenreiter, Achazschamane …)
+  (EXOTEN.EXTRA_KULT_MENSCH||[]).forEach(k=>{ if(KULTUREN.Mensch && KULTUREN.Mensch.indexOf(k)<0) KULTUREN.Mensch.push(k); });
+}
+const EXOTEN_SPEZIES = Object.keys(EXOTEN.SPEZIES||{});      // [Achaz, Goblin, Ork, Halbork]
+const eigPunktKosten = v => v<=14?15:15*(v-13);
+const eigAPfor = p => { let s=0; for(let v=9;v<=p;v++) s+=eigPunktKosten(v); return s; };
+
+// ───────── Speicher (mit Vorgaben mischen, damit alte Stände erhalten bleiben) ─────────
+const DEFAULT = { name:"",
+  persdaten:{familie:"",geburtsort:"",alter:"",geschlecht:"",groesse:"",gewicht:"",haarfarbe:"",augenfarbe:"",titel:"",sozialstatus:""},
+  notizen:"",
+  spezies:"", kultur:"", profession:"", variante:"", regelfrei:false, profAlle:false,
+  eig:{MU:12,KL:12,IN:12,CH:12,FF:12,GE:12,KO:12,KK:12},
+  lep:{akt:30,max:30}, asp:{akt:0,max:0}, kap:{akt:0,max:0}, schicksal:{akt:3,max:3},
+  vorteile:[], nachteile:[], sonderf:"",
+  talente:{}, sprachen:[], schriften:[],
+  techniken:{}, nahwaffen:[], fernwaffen:[], ruestung:[], schild:[], zustaende:{}, ksf:"",
+  inventar:[], geld:{d:0,s:0,h:0,k:0}, edelsteine:"", tragkraft:"", tier:"", notizen:"",
+  zauber:[], liturgien:[], magie:{leiteig:"",tradition:""}, karma:{leiteig:"",tradition:""},
+  create:{grad:"Erfahren",purchased:{MU:8,KL:8,IN:8,CH:8,FF:8,GE:8,KO:8,KK:8},frei1:"",minus2:"",paketBasis:{},paketBasisKT:{}} };
+let C;
+try{ C = Object.assign({}, DEFAULT, JSON.parse(localStorage.getItem('dsa-bogen'))||{}); }
+catch(e){ C = Object.assign({}, DEFAULT); }
+for(const k of ["persdaten","eig","lep","asp","kap","schicksal","talente","geld","techniken","zustaende","magie","karma"]) C[k] = Object.assign({}, DEFAULT[k], C[k]||{});
+for(const k of ["sprachen","schriften","nahwaffen","fernwaffen","ruestung","schild","inventar","zauber","liturgien","vorteile","nachteile"]) if(!Array.isArray(C[k])) C[k]=[];
+C.create = Object.assign({}, DEFAULT.create, C.create||{});
+C.create.purchased = Object.assign({}, DEFAULT.create.purchased, C.create.purchased||{});
+const save = ()=>{ if(typeof SYNC!=='undefined' && SYNC.viewing) return; localStorage.setItem('dsa-bogen', JSON.stringify(C)); if(typeof fbOnSave==='function') fbOnSave(); };
+
+// ───────── Kleine Helfer ─────────
+const boundText=[];
+function bindText(id, get, set){ const el=document.getElementById(id); if(!el) return; boundText.push({el,get}); el.value=get()||""; el.oninput=()=>{ set(el.value); save(); }; }
+// generischer Tabellen-Editor für ein Array C[arrName]
+function tableEditor(arrName, tbodyId, cols, blank, onChange){
+  function render(){
+    const tb=document.getElementById(tbodyId); if(!tb) return; tb.innerHTML="";
+    C[arrName].forEach((row,idx)=>{
+      const tr=document.createElement("tr");
+      tr.innerHTML = cols.map(c=>{
+        const inner = c.sel
+          ? `<select data-k="${c.key}" data-i="${idx}">${c.sel.map(o=>`<option${esc(String(row[c.key]||""))===o?" selected":""}>${o}</option>`).join('')}</select>`
+          : `<input ${c.type==='number'?'type="number"':''}${c.list?` list="${c.list}"`:''} value="${esc(row[c.key])}" data-k="${c.key}" data-i="${idx}" placeholder="${c.ph||''}">`;
+        return `<td class="${c.cls||''}">${inner}</td>`;
+      }).join('') + `<td class="act"><button class="x" data-del="${idx}" title="entfernen">✕</button></td>`;
+      tb.appendChild(tr);
+    });
+    tb.querySelectorAll("input[data-k]").forEach(inp=>inp.oninput=()=>{
+      const c=cols.find(x=>x.key===inp.dataset.k);
+      C[arrName][+inp.dataset.i][inp.dataset.k]= c.type==='number'?(parseFloat(inp.value)||0):inp.value;
+      save(); if(onChange) onChange();
+    });
+    tb.querySelectorAll("select[data-k]").forEach(s=>s.onchange=()=>{
+      C[arrName][+s.dataset.i][s.dataset.k]=s.value; save(); if(onChange) onChange();
+    });
+    tb.querySelectorAll("button[data-del]").forEach(b=>b.onclick=()=>{ C[arrName].splice(+b.dataset.del,1); save(); render(); if(onChange) onChange(); });
+  }
+  window['add_'+arrName]=()=>{ C[arrName].push(Object.assign({},blank)); save(); render(); if(onChange) onChange(); };
+  render();
+  return render;
+}
+
+// ───────── Kopf: Persönliche Daten + Kaskade ─────────
+const nameEl=document.getElementById("name"); nameEl.value=C.name||"";
+nameEl.oninput=()=>{ C.name=nameEl.value; save(); };
+const PERSF = [["familie","Familie"],["geburtsort","Geburtsort"],["alter","Alter"],["geschlecht","Geschlecht"],["groesse","Größe"],["gewicht","Gewicht"],["haarfarbe","Haarfarbe"],["augenfarbe","Augenfarbe"],["titel","Titel"],["sozialstatus","Sozialstatus"]];
+const pdBox=document.getElementById("persdaten");
+pdBox.innerHTML = PERSF.map(([k,l])=> k==='sozialstatus'
+  ? `<label>${l}<select data-pd="sozialstatus" id="sozialstatus-sel"></select></label>`
+  : k==='geschlecht'
+  ? `<label>${l}<select data-pd="geschlecht" id="geschlecht-sel"><option value="">– wählen –</option>${["männlich","weiblich","divers"].map(o=>`<option${C.persdaten.geschlecht===o?' selected':''}>${esc(o)}</option>`).join('')}</select></label>`
+  : `<label>${l}<input value="${esc(C.persdaten[k])}" data-pd="${k}"></label>`).join('');
+pdBox.querySelectorAll("input[data-pd]").forEach(i=>i.oninput=()=>{ C.persdaten[i.dataset.pd]=i.value; save(); });
+{ const sozSel=document.getElementById("sozialstatus-sel"); if(sozSel) sozSel.onchange=()=>{ C.persdaten.sozialstatus=sozSel.value; save(); }; }
+{ const geSel=document.getElementById("geschlecht-sel"); if(geSel) geSel.onchange=()=>{ C.persdaten.geschlecht=geSel.value; save(); }; }
+// Sozialstatus als echtes Dropdown, Optionen je Kultur (DSA: nicht jede Kultur kennt jeden Stand)
+function renderSozialstatus(){
+  const sel=document.getElementById("sozialstatus-sel"); if(!sel) return;
+  const kd=kulturDaten(C.kultur);
+  const opts=(kd && Array.isArray(kd.social) && kd.social.length) ? kd.social.slice() : ["Unfrei","Frei","Niederadel","Adel","Hochadel"];
+  // Stand hängt an der Kultur: ist der gewählte Stand für diese Kultur nicht erlaubt, wird er geleert (kein regelwidriger Charakter)
+  if(C.persdaten.sozialstatus && opts.indexOf(C.persdaten.sozialstatus)<0) C.persdaten.sozialstatus="";
+  const cur=C.persdaten.sozialstatus||"";
+  sel.innerHTML='<option value="">– wählen –</option>'+opts.map(o=>`<option${o===cur?" selected":""}>${esc(o)}</option>`).join("");
+  sel.value=cur;
+}
+renderSozialstatus();
+const notizEl=document.getElementById("notizen");
+if(notizEl){ notizEl.value=C.notizen||""; notizEl.oninput=()=>{ C.notizen=notizEl.value; save(); }; }
+// Aussehensvorschlag: Größe/Gewicht würfeln + typische Haar-/Augenfarbe nach Kultur (sonst Spezies)
+function rollDice(dice){ let s=0; (dice||[]).forEach(d=>{ const a=Math.abs(d.amount||0), sign=(d.amount||0)<0?-1:1; for(let i=0;i<a;i++) s+=sign*(1+Math.floor(Math.random()*(d.sides||6))); }); return s; }
+function aussehenVorschlag(){
+  const A=DSA.AUSSEHEN||{}, S=DSA.AUSSEHEN_SPEZIES||{};
+  const a = A[C.kultur] || S[C.spezies];
+  if(!a){ alert("Bitte zuerst Spezies und Kultur wählen, dann kann ich Aussehensvorschläge würfeln."); return; }
+  const groesse=(a.sizeBase||0)+rollDice(a.sizeDice);
+  const gewicht=Math.max(1, groesse-(a.weightBase||0)+rollDice(a.weightDice));
+  C.persdaten.groesse=groesse+" cm";
+  C.persdaten.gewicht=gewicht+" kg";
+  // Haar/Augen: zufällig aus der gewichteten Farbtabelle (häufige Farben kommen öfter) – ändert sich bei jedem Wurf
+  const pickFarbe=arr=> Array.isArray(arr)&&arr.length ? arr[Math.floor(Math.random()*arr.length)] : (typeof arr==='string'?arr:"");
+  const haar=pickFarbe(a.haar), augen=pickFarbe(a.augen);
+  if(haar) C.persdaten.haarfarbe=haar;
+  if(augen) C.persdaten.augenfarbe=augen;
+  document.querySelectorAll('#persdaten input[data-pd]').forEach(i=> i.value=C.persdaten[i.dataset.pd]||"");
+  save();
+}
+
+const spezSel=document.getElementById("spezies");
+const KERN_SPEZIES=["Mensch","Halbelf","Elf","Zwerg"];
+function renderSpezies(){
+  const cur=C.spezies;
+  const list = C.regelfrei ? KERN_SPEZIES.concat(EXOTEN_SPEZIES) : KERN_SPEZIES.slice();  // Exoten nur mit Haken
+  if(cur && list.indexOf(cur)<0) list.push(cur);   // bereits gesetzte Exoten-Spezies nicht verlieren
+  spezSel.innerHTML='<option value="">– wählen –</option>'+list.map(s=>
+    `<option value="${esc(s)}"${s===cur?" selected":""}>${esc(s)}${EXOTEN_SPEZIES.indexOf(s)>=0?"  (Erweiterung)":""}</option>`).join("");
+  spezSel.value=cur||"";
+}
+renderSpezies();
+const kult=document.getElementById("kultur"), prof=document.getElementById("profession");
+function renderKulturen(){
+  const cur=C.kultur, own=KULTUREN[C.spezies]||[];
+  kult.innerHTML="";
+  const ph=document.createElement("option"); ph.value=""; ph.textContent=(own.length||C.regelfrei)?"– wählen –":"– erst Spezies wählen –"; kult.appendChild(ph);
+  const grp=(label,arr)=>{ if(!arr.length) return; const og=document.createElement("optgroup"); og.label=label;
+    arr.forEach(n=>{ const o=document.createElement("option"); o.value=n; o.textContent=n; og.appendChild(o); }); kult.appendChild(og); };
+  grp(C.spezies?`Typisch für ${C.spezies}`:"Kulturen", own);
+  if(C.regelfrei){   // mit Freigabe: artfremde Kulturen separat, damit die typischen oben klar bleiben
+    const fremd=[...new Set(Object.values(KULTUREN).flat())].filter(n=>own.indexOf(n)<0).sort();
+    grp("Artfremd (Spielleiter-Freigabe)", fremd);
+  }
+  if(cur && ![...kult.options].some(o=>o.value===cur)){ const o=document.createElement("option"); o.value=cur; o.textContent=cur; kult.appendChild(o); }
+  kult.value=cur||"";
+  renderProfessionen();
+}
+function weltlicheFuer(k){ if(!k) return WELTLICH; if(k.w.nur) return k.w.nur; return WELTLICH.filter(p=>!k.w.aus.includes(p)); }
+function renderProfessionen(){
+  const cur=C.profession;
+  prof.innerHTML="";
+  const p=document.createElement("option"); p.value=""; p.textContent="– wählen –"; prof.appendChild(p);
+  const pr=DSA.PROFESSIONEN||{}, GRL={1:"Weltliche Professionen",2:"Zaubererprofessionen",3:"Geweihtenprofessionen"};
+  const kult=kulturDaten(C.kultur);
+  const typ = kult ? new Set([...(kult.profWeltlich||[]),...(kult.profMagisch||[]),...(kult.profGeweiht||[])]) : null;
+  const wrap=document.getElementById("proffilter-wrap"); if(wrap) wrap.style.display = typ ? "" : "none";
+  const showAll = !typ || C.profAlle;    // eigener Haken „auch untypische Professionen" – unabhängig von der SL-Freigabe
+  const istTyp=n=> typ && typ.has(n);
+  const add=(label,arr)=>{ if(!arr.length) return; const og=document.createElement("optgroup"); og.label=label;
+    arr.sort((a,b)=> (istTyp(b)?1:0)-(istTyp(a)?1:0) || a.localeCompare(b))   // typische zuerst
+       .forEach(n=>{ const o=document.createElement("option"); o.value=n;
+      o.textContent = (showAll && istTyp(n)) ? n+"  ✓ typisch" : n; og.appendChild(o); }); prof.appendChild(og); };
+  [1,2,3].forEach(g=>{
+    let names=Object.keys(pr).filter(n=>pr[n].gr===g);
+    if(!showAll) names=names.filter(n=>typ.has(n));
+    if(g===1){
+      add("Weltlich · Kämpferisch", names.filter(n=>pr[n].sgr===2));
+      add("Weltlich · Profan & Gesellschaft", names.filter(n=>pr[n].sgr!==2));
+    } else add(GRL[g], names);
+  });
+  if(cur){ if(![...prof.options].some(o=>o.value===cur)){ const o=document.createElement("option"); o.value=cur; o.textContent=cur; prof.appendChild(o); } prof.value=cur; }
+  renderPaketVorschau();
+}
+spezSel.onchange=()=>{ const pk=C.kultur; C.spezies=spezSel.value; if(pk && !C.regelfrei && !(KULTUREN[C.spezies]||[]).includes(pk)) C.kultur=""; C.profession=""; C.variante=""; renderKulturen(); renderDerived(); renderErschaffung(); renderTalentSelect(); renderTalente(); renderLore(); renderSozialstatus(); save(); };
+kult.onchange=()=>{
+  const pp=C.profession;
+  C.kultur=kult.value;
+  if(pp && !C.profAlle && C.kultur){
+    const kd=kulturDaten(C.kultur);
+    if(kd){
+      const typ=new Set([...(kd.profWeltlich||[]),...(kd.profMagisch||[]),...(kd.profGeweiht||[])]);
+      if(typ.size && !typ.has(pp)){ C.profession=""; C.variante=""; }
+    }
+  }
+  renderProfessionen(); renderVariante(); renderTalentSelect(); renderTalente(); renderLore(); renderSozialstatus(); save();
+};
+prof.onchange=()=>{ C.profession=prof.value; C.variante=""; save(); renderVariante(); renderTalentSelect(); renderTalente(); renderLore(); };
+const regelfreiChk=document.getElementById("regelfrei");
+if(regelfreiChk){ regelfreiChk.checked=!!C.regelfrei; regelfreiChk.onchange=()=>{ C.regelfrei=regelfreiChk.checked; save(); renderSpezies(); renderKulturen(); renderLore(); }; }
+const profAlleChk=document.getElementById("profAlle");
+if(profAlleChk){ profAlleChk.checked=!!C.profAlle; profAlleChk.onchange=()=>{ C.profAlle=profAlleChk.checked; save(); renderProfessionen(); }; }
+// Hintergrund-Beschreibungen (Wiki Aventurica) zu Spezies/Kultur/Profession
+function loreURL(lemma){ return "https://de.wiki-aventurica.de/wiki/"+encodeURIComponent((lemma||"").replace(/ /g,"_")); }
+function renderLore(){
+  const box=document.getElementById("lorebox"); if(!box) return;
+  const ku=(LORE.kulturen||{})[C.kultur] || (LORE.kulturen||{})[(typeof KULT_ALIAS!=='undefined'&&KULT_ALIAS[C.kultur])||""];
+  const rows=[["Spezies",C.spezies,(LORE.spezies||{})[C.spezies]],["Kultur",C.kultur,ku],["Profession",C.profession,(LORE.professionen||{})[C.profession]]];
+  const items=rows.filter(r=>r[2]&&r[2].text).map(([label,name,e])=>
+    `<details class="lore"><summary><b>${label}:</b> ${esc(name)}</summary><div class="loretext">${esc(e.text)} <a href="${loreURL(e.lemma)}" target="_blank" rel="noopener">→ Wiki Aventurica</a></div></details>`);
+  box.innerHTML = items.length ? `<div class="lore-h">Hintergrund</div>${items.join("")}` : "";
+}
+renderLore();
+renderKulturen();
+
+// ───────── Eigenschaften ─────────
+const eigBox=document.getElementById("eig");
+EIG.forEach(([k,voll])=>{
+  const b=document.createElement("div"); b.className="b";
+  b.innerHTML=`<div class="lab">${voll}</div>`;
+  const i=document.createElement("input"); i.className="val"; i.type="number"; i.value=C.eig[k]; i.dataset.eig=k;
+  i.oninput=()=>{ C.eig[k]=parseInt(i.value)||0; save(); renderDerived(); renderTechniken(); };
+  const upd=dd=>{ const v=(parseInt(i.value)||0)+dd; C.eig[k]=v; i.value=v; save(); renderDerived(); renderTechniken(); };
+  const row=document.createElement("div"); row.className="eigstep";
+  const bm=document.createElement("button"); bm.className="eigbtn"; bm.textContent="−"; bm.onclick=()=>upd(-1);
+  const bp=document.createElement("button"); bp.className="eigbtn"; bp.textContent="+"; bp.onclick=()=>upd(1);
+  row.appendChild(bm); row.appendChild(i); row.appendChild(bp);
+  b.appendChild(row); eigBox.appendChild(b);
+});
+
+// ───────── Energien + Schicksalspunkte ─────────
+const EN=[["lep","Lebenspunkte","var(--leben)"],["asp","Astralpunkte","var(--astral)"],["kap","Karmapunkte","var(--karma)"]];
+const enBox=document.getElementById("energie");
+function renderEnergie(){
+  enBox.innerHTML="";
+  for(const [key,voll,col] of EN){
+    const e=C[key], pct=e.max>0?Math.max(0,Math.min(100,100*e.akt/e.max)):0;
+    const row=document.createElement("div"); row.className="energy";
+    row.innerHTML=`<span class="lab">${voll}</span>
+      <div class="track"><span style="width:${pct}%;background:${col}"></span><b>${e.akt} / ${e.max}</b></div>
+      <span class="stepper">
+        <button data-k="${key}" data-v="-5">−5</button><button data-k="${key}" data-v="-1">−1</button>
+        <button data-k="${key}" data-v="1">+1</button><button data-k="${key}" data-v="5">+5</button>
+      </span>
+      <label class="mxlab">Max<input class="mx" type="number" value="${e.max}" data-max="${key}"></label>`;
+    enBox.appendChild(row);
+  }
+  // Schicksalspunkte (klein)
+  const s=C.schicksal;
+  const sr=document.createElement("div"); sr.className="energy";
+  sr.innerHTML=`<span class="lab">Schicksalspunkte</span>
+    <div class="track"><span style="width:${s.max>0?Math.min(100,100*s.akt/s.max):0}%;background:var(--gold)"></span><b>${s.akt} / ${s.max}</b></div>
+    <span class="stepper"><button data-sk="-1">−1</button><button data-sk="1">+1</button></span>
+    <label class="mxlab">Max<input class="mx" type="number" value="${s.max}" data-smax="1"></label>`;
+  enBox.appendChild(sr);
+
+  enBox.querySelectorAll("button[data-k]").forEach(b=>b.onclick=()=>{
+    const e=C[b.dataset.k]; e.akt=Math.max(0,Math.min(e.max,e.akt+parseInt(b.dataset.v))); save(); renderEnergie(); renderSchmerz();
+  });
+  enBox.querySelectorAll("input[data-max]").forEach(i=>i.oninput=()=>{
+    const e=C[i.dataset.max]; e.max=parseInt(i.value)||0; e.akt=Math.min(e.akt,e.max); save(); renderEnergie(); renderSchmerz();
+  });
+  enBox.querySelectorAll("button[data-sk]").forEach(b=>b.onclick=()=>{ s.akt=Math.max(0,Math.min(s.max,s.akt+parseInt(b.dataset.sk))); save(); renderEnergie(); });
+  enBox.querySelector("input[data-smax]").oninput=e=>{ s.max=parseInt(e.target.value)||0; s.akt=Math.min(s.akt,s.max); save(); renderEnergie(); };
+}
+renderEnergie();
+
+// ───────── Abgeleitete Werte (Formeln aus dem Regelwiki) ─────────
+const enBox2=document.getElementById("derived");
+function renderDerived(){
+  const E=C.eig, sp=SPEZIES[C.spezies];
+  const aw=Math.round(E.GE/2), ini=Math.round((E.MU+E.GE)/2);
+  const cards=[];
+  if(sp){
+    const lep=sp.lep+2*E.KO;
+    const sk=sp.sk+Math.round((E.MU+E.KL+E.IN)/6);
+    const zk=sp.zk+Math.round((E.KO+E.KO+E.KK)/6);
+    cards.push(`<div class="d"><div class="dl">Lebensenergie (Vorschlag)</div><div class="dv">${lep}</div><small>Spezies + 2 × Konstitution</small><button onclick="lepUebernehmen(${lep})">als Maximum setzen</button></div>`);
+    cards.push(`<div class="d"><div class="dl">Seelenkraft</div><div class="dv">${sk}</div><small>Spezies + (Mut+Klugheit+Intuition)÷6</small></div>`);
+    cards.push(`<div class="d"><div class="dl">Zähigkeit</div><div class="dv">${zk}</div><small>Spezies + (2×Konstitution+Körperkraft)÷6</small></div>`);
+  }
+  cards.push(`<div class="d"><div class="dl">Ausweichen</div><div class="dv">${aw}</div><small>Gewandtheit ÷ 2</small></div>`);
+  cards.push(`<div class="d"><div class="dl">Initiative</div><div class="dv">${ini}</div><small>(Mut + Gewandtheit) ÷ 2, + 1W6 im Kampf</small></div>`);
+  if(sp) cards.push(`<div class="d"><div class="dl">Geschwindigkeit</div><div class="dv">${sp.gs}</div><small>Spezies-Grundwert</small></div>`);
+  else   cards.push(`<div class="d"><div class="dl">Lebensenergie · Seelenkraft · Zähigkeit · Geschwindigkeit</div><div class="dv" style="font-size:14px">Spezies wählen</div></div>`);
+  enBox2.innerHTML=cards.join("");
+}
+function lepUebernehmen(v){ C.lep.max=v; C.lep.akt=v; save(); renderEnergie(); renderSchmerz(); }
+renderDerived();
+
+// ───────── Würfel ─────────
+function wurf(expr){
+  expr=(expr||"").trim().toUpperCase().replace("X","");
+  const m=expr.match(/^(\d*)W(\d+)([+-]\d+)?$/);
+  const out=document.getElementById("diceout");
+  if(!m){ out.textContent="Bitte ein Format wie 3W20 oder 2W6+4 eingeben."; return; }
+  const n=parseInt(m[1]||"1"), seiten=parseInt(m[2]), mod=parseInt(m[3]||"0");
+  const r=Array.from({length:n},()=>d(seiten)), sum=r.reduce((a,b)=>a+b,0)+mod;
+  out.innerHTML=`<b>${n} × W${seiten}${mod?(mod>0?" + "+mod:" − "+(-mod)):""}</b>: [${r.join(", ")}] = <b style="color:var(--red);font-size:20px">${sum}</b>`;
+}
+
+// ───────── Talente ─────────
+const sel=document.getElementById("talsel");
+const byKat={};
+Object.entries(TALENTE).forEach(([n,t])=>{ (byKat[t.kat]=byKat[t.kat]||[]).push(n); });
+function typklasse(name){
+  const cult=kulturDaten(C.kultur), prof=(DSA.PROFESSIONEN||{})[C.profession];
+  if((cult&&(cult.common||[]).includes(name)) || (prof&&(prof.talente||[]).some(t=>t.name===name))) return "typisch";
+  if(cult&&(cult.uncommon||[]).includes(name)) return "untypisch";
+  return "";
+}
+function renderTalentSelect(){
+  sel.innerHTML="";
+  const groups={typisch:[], neutral:[], untypisch:[]};
+  Object.keys(TALENTE).forEach(n=>{ const tk=typklasse(n); groups[tk==="typisch"?"typisch":tk==="untypisch"?"untypisch":"neutral"].push(n); });
+  [["typisch","✓ Typisch"],["neutral","Weitere Talente"],["untypisch","✗ Untypisch"]].forEach(([key,label])=>{
+    if(!groups[key].length) return;
+    const og=document.createElement("optgroup"); og.label=label;
+    groups[key].sort().forEach(n=>{ const o=document.createElement("option"); o.value=n;
+      const kurz=(TALENTE[n].kat||"").replace("talente","").replace("Talente",""), drin=(n in C.talente);
+      o.textContent = n + (kurz?` · ${kurz}`:"") + (drin?"  — schon dabei":"");
+      if(drin) o.disabled=true;
+      og.appendChild(o); });
+    sel.appendChild(og);
+  });
+}
+renderTalentSelect();
+const vsel=document.getElementById("variante");
+vsel.onchange=()=>{ C.variante=vsel.value; save(); renderPaketVorschau(); };
+function varianteLabel(name){   // nur Name + AP-Differenz; die genauen Änderungen stehen in der Paket-Vorschau
+  const v=(DSA.VARIANTEN||{})[name]; if(!v) return name;
+  return name + (v.cost!=null?` (${v.cost>0?"+":""}${v.cost} AP)`:"");
+}
+function renderVariante(){
+  const wrap=document.getElementById("variante-wrap"), prof=(DSA.PROFESSIONEN||{})[C.profession], vars=(prof&&prof.varianten)||[];
+  if(!vars.length){ wrap.style.display="none"; vsel.innerHTML=""; return; }
+  const pflicht = !!(prof&&prof.variantePflicht);   // greift nur, weil hier schon Varianten existieren
+  wrap.style.display="";
+  const lab=document.getElementById("variante-lab"); if(lab) lab.textContent = pflicht?"Variante (Pflicht) – Unterschied steht jeweils dabei":"Variante (optional) – Unterschied steht jeweils dabei";
+  vsel.innerHTML = (pflicht?"":'<option value="">– keine –</option>')+vars.map(v=>`<option value="${esc(v)}"${C.variante===v?" selected":""}>${esc(varianteLabel(v))}</option>`).join("");
+  if(pflicht && !C.variante){ C.variante=vars[0]; vsel.value=vars[0]; save(); }
+  renderPaketVorschau();
+}
+renderVariante();
+function renderPaketVorschau(){
+  const box=document.getElementById("paketvorschau"); if(!box) return;
+  const cult=kulturDaten(C.kultur), prof=(DSA.PROFESSIONEN||{})[C.profession];
+  if(!C.spezies && !cult && !prof){ box.innerHTML=""; return; }
+  const tl=arr=>(arr||[]).map(t=>`${t.name}${t.value!=null?` +${t.value}`:""}`).join(", ");
+  const ap=n=> n===0 ? `<span style="color:var(--dim)">gratis</span>` : `<b>${n>0?'':''}${n} AP</b>`;
+  let h="";
+  if(C.spezies) h+=`<div><b>Spezies ${esc(C.spezies)}</b> (${ap(SPEZ_AP[C.spezies]||0)}): Auto-Vorteile ${SPEZ_AUTO[C.spezies]||'—'}</div>`;
+  if(cult) h+=`<div style="margin-top:3px"><b>Kultur ${esc(C.kultur)}</b> (${ap(0)}): `+(cult.paket&&cult.paket.length?tl(cult.paket):"keine Start-Talente")+`</div>`;
+  if(prof){
+    const parts=[];
+    if(prof.talente&&prof.talente.length) parts.push("Talente: "+tl(prof.talente));
+    if(prof.kampftechniken&&prof.kampftechniken.length) parts.push("Kampftechniken: "+tl(prof.kampftechniken));
+    if(prof.zauber&&prof.zauber.length) parts.push("Zauber: "+prof.zauber.map(t=>t.name).join(", "));
+    h+=`<div style="margin-top:3px"><b>Profession ${esc(C.profession)}</b> (${ap(prof.cost||0)}): `+(parts.length?parts.join(" · "):"—")+`</div>`;
+  }
+  const vari=(DSA.VARIANTEN||{})[C.variante];
+  if(vari && (vari.talente.length || vari.kampftechniken.length)){
+    const vt=[...vari.talente.map(t=>`${t.name} ${t.value>0?'+':''}${t.value}`), ...vari.kampftechniken.map(t=>`${t.name} ${t.value>0?'+':''}${t.value}`)].join(", ");
+    h+=`<div style="margin-top:3px;color:var(--red)"><b>Variante ${esc(C.variante)}</b> (${vari.cost!=null?ap(vari.cost):'0 AP'}) ändert: ${vt}</div>`;
+  }
+  box.innerHTML=`<div class="vorschau"><div class="vorschau-h">Das bekommst du – und was es kostet:</div>${h}</div>`;
+}
+function paketAnwenden(){
+  const cult=kulturDaten(C.kultur), prof=(DSA.PROFESSIONEN||{})[C.profession], vari=(DSA.VARIANTEN||{})[C.variante], sums={};
+  const add=arr=>(arr||[]).forEach(t=>{ if(t.name in TALENTE) sums[t.name]=(sums[t.name]||0)+(t.value||0); });
+  if(cult) add(cult.paket); if(prof) add(prof.talente); if(vari) add(vari.talente);   // Variante = Deltas obendrauf
+  Object.entries(sums).forEach(([nm,v])=>{ C.talente[nm]=Math.max(0,v); });
+  C.create.paketBasis={}; Object.entries(sums).forEach(([nm,v])=>{ C.create.paketBasis[nm]=Math.max(0,v); });  // Paketwerte = gratis; Steigerung darüber kostet AP
+  const kt={}; const addKt=arr=>(arr||[]).forEach(t=>{ kt[t.name]=(kt[t.name]||0)+(t.value||0); });
+  if(prof) addKt(prof.kampftechniken); if(vari) addKt(vari.kampftechniken);
+  Object.entries(kt).forEach(([nm,v])=>{ C.techniken[nm]=Object.assign({ktw:6,at:"",pa:""},C.techniken[nm]); C.techniken[nm].ktw=Math.max(6,6+v); });
+  C.create.paketBasisKT={}; Object.entries(kt).forEach(([nm,v])=>{ C.create.paketBasisKT[nm]=Math.max(6,6+v); });  // Kampftechnik-Paketwerte = gratis
+  save(); renderTalente(); renderTechniken();
+}
+// ───────── Fertige Helden (Schnellstart-Pregens) ─────────
+const PREGENS = window.DSAPREGENS || {};
+(function(){ const s=document.getElementById("pregensel"); if(!s) return;
+  s.innerHTML='<option value="">– Held wählen –</option>'+Object.keys(PREGENS).map(n=>{ const h=PREGENS[n];
+    return `<option value="${esc(n)}">${esc(n)} — ${esc(h.spezies)} · ${esc(h.profession)}</option>`; }).join(""); })();
+const KURZEIG={Mut:"MU",Klugheit:"KL",Intuition:"IN",Charisma:"CH",Fingerfertigkeit:"FF",Gewandtheit:"GE",Konstitution:"KO",Körperkraft:"KK"};
+function splitListe(t){ return (t||"").split(/,(?![^(]*\))/).map(x=>x.trim()).filter(Boolean); }
+function ladePregenAusSelect(){ const n=document.getElementById("pregensel").value; if(!n){ alert("Bitte erst einen Helden wählen."); return; } ladePregen(n); }
+function ladePregen(name){
+  const h=PREGENS[name]; if(!h) return;
+  if(!confirm(`„${name}" laden? Das überschreibt deinen aktuellen Bogen vollständig.`)) return;
+  const N=JSON.parse(JSON.stringify(DEFAULT));
+  N.name=h.name; N.spezies=h.spezies; N.kultur=h.kultur; N.profession=h.profession; N.variante="";
+  N.eig=Object.assign({},h.eig);
+  N.lep={akt:h.lep,max:h.lep}; N.asp={akt:h.asp||0,max:h.asp||0}; N.schicksal={akt:h.schips,max:h.schips};
+  N.talente=Object.assign({},h.talente);
+  N.techniken={}; Object.entries(h.kampftechniken||{}).forEach(([k,v])=>{ N.techniken[k]={ktw:v.ktw,at:v.at||v.fk||"",pa:v.pa||""}; });
+  N.zauber=(h.zauber||[]).map(z=>({name:z.name,probe:(z.probe||"").split("/").map(p=>KURZEIG[p.trim()]||p.trim()).join("/"),fw:z.fw,kosten:"",rw:"",wd:"",wirkung:""}));
+  N.vorteile=splitListe(h.vorteile).map(x=>({name:x,ap:""}));
+  N.nachteile=splitListe(h.nachteile).map(x=>({name:x,ap:""}));
+  N.sonderf=h.sonderf||"";
+  const stufeAus=x=>{ const m=x.match(/^(.*?)\s+([IVX]{1,3})$/); return m?{n:m[1].trim(),s:m[2]}:{n:x,s:""}; };
+  N.sprachen=splitListe(h.sprachen).map(x=>{ const r=stufeAus(x); return {name:r.n,stufe:r.s}; });
+  N.schriften=splitListe(h.schriften).map(x=>{ const r=stufeAus(x); return {name:r.n,komplex:r.s}; });
+  if((h.asp||0)>0) N.magie={leiteig:"",tradition:""};
+  localStorage.setItem('dsa-bogen', JSON.stringify(N));
+  location.reload();
+}
+function addTalent(){ const name=sel.value; if(!name||!TALENTE[name]) return; if(!(name in C.talente)) C.talente[name]=4; save(); renderTalente(); renderTalentSelect(); }
+const cssid = s => s.replace(/[^a-zA-Z0-9]/g,"_");
+const leitext = probe => probe.map(k=>NAME[k]).join(" · ");
+function probe(name){
+  const t=TALENTE[name], fw=C.talente[name]||0, eig=t.probe.map(k=>C.eig[k]||0);
+  const mod=parseInt(document.getElementById("mod-"+cssid(name)).value)||0;
+  const dice=[d(20),d(20),d(20)];
+  const ones=dice.filter(x=>x===1).length, twenties=dice.filter(x=>x===20).length;
+  let abzug=0; const det=dice.map((w,i)=>{const need=Math.max(0,w-eig[i]); abzug+=need; return `${w}${need?` (−${need})`:""}`;});
+  let uebrig=fw+mod-abzug, gelungen=uebrig>=0, crit=false, patzer=false;
+  if(twenties>=2){gelungen=false;patzer=true;} if(ones>=2){gelungen=true;crit=true;}
+  const qs=gelungen?Math.min(6,Math.max(1,Math.ceil(Math.max(0,uebrig)/3))):0;
+  const status = patzer?`<span class="tag b">Patzer!</span>`:crit?`<span class="tag g">Kritischer Erfolg!</span>`
+    : gelungen?`<span class="tag g">gelungen · Qualität ${qs}</span>`:`<span class="tag b">misslungen</span>`;
+  const rid="res-"+cssid(name);
+  document.getElementById(rid).innerHTML =
+    `<button class="x" title="ausblenden" style="float:right" onclick="document.getElementById('${rid}').innerHTML=''">✕</button>`+
+    `${status} &nbsp; Würfe: ${det.join(" / ")} <span style="color:var(--dim)">gegen ${leitext(t.probe)} (${eig.join(" / ")})`+
+    `${uebrig>=0?` — ${uebrig} Punkte übrig`:` — ${-uebrig} Punkte zu wenig`}</span>`;
+}
+// Talent-Steigerungskosten (DSA5): Stufe 1–12 = Basis (A1/B2/C3/D4), ab Stufe 13 Basis×(Stufe−11)
+const SF_BASIS={A:1,B:2,C:3,D:4};
+function talentKosten(sf, von, bis){ const b=SF_BASIS[sf]||2; let ap=0; for(let T=Math.max(0,von|0)+1; T<=bis; T++) ap+=b*Math.max(1,T-11); return Math.max(0,ap); }
+function talentSF(name){ return (DSA.TALENT_SF||{})[name]||"B"; }
+function talentAP(name){ return talentKosten(talentSF(name), (C.create.paketBasis||{})[name]||0, C.talente[name]||0); }  // nur Steigerung über dem Gratis-Paket
+function talenteAPgesamt(){ return Object.keys(C.talente||{}).reduce((s,n)=>s+talentAP(n),0); }
+function ktSF(name){ return (DSA.KT_SF||{})[name]||"B"; }
+function ktAP(name){ const t=C.techniken[name]||{}; const ktw=(t.ktw===""||t.ktw==null)?6:(parseInt(t.ktw)||6); const basis=(C.create.paketBasisKT||{})[name]||6; return talentKosten(ktSF(name), Math.max(6,basis), Math.max(6,ktw)); }  // Kampftechnik ab KtW 6
+function kampftechnikAPgesamt(){ return Object.keys(C.techniken||{}).reduce((s,n)=>s+ktAP(n),0); }
+function vorteilAP(){ return (C.vorteile||[]).reduce((s,v)=>s+(parseInt(v.ap)||0),0); }      // Vorteile kosten AP
+function nachteilAP(){ return (C.nachteile||[]).reduce((s,v)=>s+(parseInt(v.ap)||0),0); }     // Nachteile bringen AP
+function renderTalente(){
+  const box=document.getElementById("meinetalente"); box.innerHTML="";
+  const names=Object.keys(C.talente).sort();
+  if(!names.length){ box.innerHTML='<div class="hint" style="padding-top:8px">Noch nichts gewählt. Oben ein Talent aus der Liste hinzufügen.</div>'; return; }
+  const sum=document.createElement("div"); sum.className="talente-sum";
+  sum.innerHTML=`Steigerungskosten der Talente: <b id="talente-ap-sum">${talenteAPgesamt()} AP</b> <span style="color:var(--dim);font-weight:normal;font-size:11px">(nur was über dem gratis Professions-/Kulturpaket liegt; Eigenschaften zählt der Reiter Heldenerschaffung separat)</span>`;
+  box.appendChild(sum);
+  names.forEach(name=>{
+    const t=TALENTE[name]; if(!t) return;
+    const row=document.createElement("div"); row.className="tz";
+    row.innerHTML=`
+      <span class="nm">${name}<span class="le">${leitext(t.probe)} · Steigerungsfaktor ${talentSF(name)} · <b id="tap-${cssid(name)}">${talentAP(name)} AP</b></span></span>
+      <span class="field">Fertigkeitswert<input type="number" value="${C.talente[name]}" data-fw="${name}"></span>
+      <span class="field">Erschwernis<input type="number" value="0" id="mod-${cssid(name)}"></span>
+      <button class="acc" data-probe="${name}">Probe würfeln</button>
+      <button class="x" data-del="${name}" title="entfernen">✕</button>
+      <div class="res" id="res-${cssid(name)}"></div>`;
+    box.appendChild(row);
+  });
+  box.querySelectorAll("input[data-fw]").forEach(i=>i.oninput=()=>{ C.talente[i.dataset.fw]=parseInt(i.value)||0; save();
+    const ap=document.getElementById("tap-"+cssid(i.dataset.fw)); if(ap) ap.textContent=talentAP(i.dataset.fw)+" AP";
+    const tot=document.getElementById("talente-ap-sum"); if(tot) tot.textContent=talenteAPgesamt()+" AP"; });
+  box.querySelectorAll("button[data-probe]").forEach(b=>b.onclick=()=>probe(b.dataset.probe));
+  box.querySelectorAll("button[data-del]").forEach(b=>b.onclick=()=>{ delete C.talente[b.dataset.del]; save(); renderTalente(); renderTalentSelect(); });
+}
+renderTalente();
+
+// Sprachen & Schriften (mit Auswahllisten aus dem Regelwerk)
+function mkDatalist(id, items){ const dl=document.createElement("datalist"); dl.id=id; dl.innerHTML=items.map(x=>`<option value="${esc(x)}">`).join(""); document.body.appendChild(dl); }
+mkDatalist("dl-sprachen", SPRACHEN); mkDatalist("dl-schriften", SCHRIFTEN); mkDatalist("dl-sozialstatus", SOZIALSTATUS);
+const renderSprachen = tableEditor("sprachen","sprachen",[{key:"name",ph:"z.B. Garethi",list:"dl-sprachen"},{key:"stufe",cls:"num",sel:["","I","II","III"]}],{name:"",stufe:""});
+const renderSchriften = tableEditor("schriften","schriften",[{key:"name",ph:"z.B. Kusliker Zeichen",list:"dl-schriften"},{key:"komplex",cls:"num",sel:["","I","II","III"]}],{name:"",komplex:""});
+
+// ───────── Kampf ─────────
+const KT_INFO={}; (DSA.KAMPFTECHNIKEN||[]).forEach(k=>KT_INFO[k.name]={leit:k.leit||[],fern:!!k.fern});
+// DSA5: Leiteigenschaftsbonus = +1 je 3 volle Punkte ueber 8 (empirisch aus den Pregens belegt)
+function leitBonus(attr){ return Math.max(0, Math.floor(((parseInt(C.eig[attr])||0)-8)/3)); }
+function ktwOf(tech){ const t=C.techniken[tech]; return (t&&t.ktw!=null&&t.ktw!=="")?(parseInt(t.ktw)||6):6; }
+// Kampfwerte aus KtW + Leiteigenschaft (+ optionalem Waffen-Modifikator)
+function kampfAT(tech,mod){ return ktwOf(tech)+leitBonus("MU")+(parseInt(mod)||0); }            // Nahkampf-AT: Mut
+function kampfPA(tech,mod){ const l=(KT_INFO[tech]||{}).leit||[]; return Math.ceil(ktwOf(tech)/2)+leitBonus(l[0]||"GE")+(parseInt(mod)||0); }
+function kampfFK(tech,mod){ const l=(KT_INFO[tech]||{}).leit||[]; return ktwOf(tech)+leitBonus(l[0]||"FF")+(parseInt(mod)||0); } // Fernkampf: Leiteigenschaft (FF)
+function renderTechniken(){
+  const tb=document.getElementById("techniken"); tb.innerHTML="";
+  [...new Set([...KAMPFTECHNIKEN, ...Object.keys(C.techniken)])].forEach(name=>{
+    const t=C.techniken[name]||{};
+    const ktw=(t.ktw===""||t.ktw==null)?6:t.ktw;   // ungelernt = Grundwert 6
+    const fern=(KT_INFO[name]||{}).fern;
+    const at = fern ? "—" : kampfAT(name);
+    const pa = fern ? `FK ${kampfFK(name)}` : kampfPA(name);
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td>${name}</td>
+      <td class="num"><input value="${esc(ktw)}" data-tk="ktw" data-n="${esc(name)}"></td>
+      <td class="num derv">${at}</td>
+      <td class="num derv">${pa}</td>`;
+    tb.appendChild(tr);
+  });
+  tb.querySelectorAll("input[data-tk]").forEach(i=>i.oninput=()=>{
+    const n=i.dataset.n; C.techniken[n]=Object.assign({ktw:""},C.techniken[n]); C.techniken[n].ktw=i.value; save(); renderTechniken();
+  });
+}
+renderTechniken();
+const renderNah = tableEditor("nahwaffen","nahwaffen",[{key:"name",ph:"z.B. Schwert",list:"dl-nahwaffen"},{key:"technik",ph:"Schwerter"},{key:"tp",cls:"num",ph:"1W6+4"},{key:"mod",cls:"num",ph:"0"},{key:"rw",cls:"num",ph:"kurz"},{key:"at",cls:"num"},{key:"pa",cls:"num"}],{name:"",technik:"",tp:"",mod:"",rw:"",at:"",pa:""});
+const renderFern = tableEditor("fernwaffen","fernwaffen",[{key:"name",ph:"z.B. Bogen",list:"dl-fernwaffen"},{key:"technik",ph:"Bögen"},{key:"ladezeit",cls:"num"},{key:"tp",cls:"num",ph:"1W6+4"},{key:"rw",ph:"50/100/200"},{key:"fk",cls:"num"}],{name:"",technik:"",ladezeit:"",tp:"",rw:"",fk:""});
+mkDatalist("dl-nahwaffen",(DSA.WAFFEN_NAH||[]).filter(w=>w.technik!=="Schilde").map(w=>w.name));
+mkDatalist("dl-fernwaffen",(DSA.WAFFEN_FERN||[]).map(w=>w.name));
+mkDatalist("dl-ruestungen",(DSA.RUESTUNGEN||[]).map(r=>r.name));
+mkDatalist("dl-schilde",(DSA.WAFFEN_NAH||[]).filter(w=>w.technik==="Schilde").map(w=>w.name));
+function addNahwaffe(){ const inp=document.getElementById("nahwaffenpick"), w=(DSA.WAFFEN_NAH||[]).find(x=>x.name===inp.value.trim()); if(!w)return; C.nahwaffen.push({name:w.name,technik:w.technik,tp:w.tp,mod:`${w.at}/${w.pa}`,rw:w.rw,at:kampfAT(w.technik,w.at),pa:kampfPA(w.technik,w.pa)}); save(); renderNah(); inp.value=""; }
+function addFernwaffe(){ const inp=document.getElementById("fernwaffenpick"), w=(DSA.WAFFEN_FERN||[]).find(x=>x.name===inp.value.trim()); if(!w)return; C.fernwaffen.push({name:w.name,technik:w.technik,ladezeit:w.lz,tp:w.tp,rw:w.rw,fk:kampfFK(w.technik)}); save(); renderFern(); inp.value=""; }
+function addRuestung(){ const inp=document.getElementById("ruestungpick"), r=(DSA.RUESTUNGEN||[]).find(x=>x.name===inp.value.trim()); if(!r)return; C.ruestung.push({name:r.name,rs:r.rs,be:r.be,gewicht:""}); save(); renderRuestung(); inp.value=""; }
+function addSchild(){ const inp=document.getElementById("schildpick"), s=(DSA.WAFFEN_NAH||[]).find(x=>x.name===inp.value.trim()&&x.technik==="Schilde"); if(!s)return; C.schild.push({name:s.name,mod:`${s.at}/${s.pa}`,gewicht:""}); save(); renderSchild(); inp.value=""; }
+const renderRuestung = tableEditor("ruestung","ruestung",[{key:"name",ph:"z.B. Lederharnisch"},{key:"rs",cls:"num"},{key:"be",cls:"num"},{key:"gewicht",cls:"num"}],{name:"",rs:"",be:"",gewicht:""});
+const renderSchild = tableEditor("schild","schild",[{key:"name",ph:"z.B. Holzschild"},{key:"mod",cls:"num",ph:"+1/-1"},{key:"gewicht",cls:"num"}],{name:"",mod:"",gewicht:""});
+
+function renderZustaende(){
+  const box=document.getElementById("zustaende"); box.innerHTML="";
+  ZUSTAENDE.forEach(z=>{
+    const lvl=C.zustaende[z]||0;
+    const el=document.createElement("div"); el.className="zr";
+    el.innerHTML=`<span class="zn">${z}</span><button data-zz="${z}" data-d="-1">−</button><span class="zv">${lvl}</span><button data-zz="${z}" data-d="1">+</button>`;
+    box.appendChild(el);
+  });
+  box.querySelectorAll("button[data-zz]").forEach(b=>b.onclick=()=>{
+    const z=b.dataset.zz; C.zustaende[z]=Math.max(0,Math.min(4,(C.zustaende[z]||0)+parseInt(b.dataset.d))); save(); renderZustaende();
+  });
+}
+renderZustaende();
+function renderSchmerz(){
+  const el=document.getElementById("schmerzauto"); if(!el) return;
+  const {akt,max}=C.lep; let s=0;
+  if(max>0){ if(akt<=0.75*max)s++; if(akt<=0.5*max)s++; if(akt<=0.25*max)s++; } if(akt<=5)s++; s=Math.min(4,s);
+  let txt = akt<=0 ? `<b class="bad">0 Lebenspunkte – dein Held liegt im Sterben.</b>` :
+    `Aus deiner Lebensenergie ergeben sich automatisch <b>${s}</b> Stufe(n) Schmerz (je ¼ verlorene Lebensenergie +1, bei 5 oder weniger +1).`;
+  el.innerHTML=txt;
+}
+renderSchmerz();
+bindText("ksf",()=>C.ksf,v=>C.ksf=v);
+
+// ───────── Besitz ─────────
+const renderInv = tableEditor("inventar","inventar",
+  [{key:"name",ph:"Gegenstand"},{key:"anzahl",type:"number",cls:"num"},{key:"gewicht",type:"number",cls:"num"},{key:"getragen",ph:"am Körper / im Rucksack"}],
+  {name:"",anzahl:1,gewicht:0,getragen:""}, renderGewicht);
+function renderGewicht(){
+  const sum=C.inventar.reduce((a,it)=>a+(parseFloat(it.gewicht)||0)*(parseFloat(it.anzahl)||0),0);
+  const el=document.getElementById("gesamtgewicht"); if(el) el.textContent=(Math.round(sum*100)/100);
+}
+renderGewicht();
+document.querySelectorAll("input[data-geld]").forEach(i=>{ i.value=C.geld[i.dataset.geld]||0; i.oninput=()=>{ C.geld[i.dataset.geld]=parseInt(i.value)||0; save(); }; });
+bindText("edelsteine",()=>C.edelsteine,v=>C.edelsteine=v);
+bindText("tragkraft",()=>C.tragkraft,v=>C.tragkraft=v);
+bindText("tier",()=>C.tier,v=>C.tier=v);
+bindText("notizen",()=>C.notizen,v=>C.notizen=v);
+function apNum(x){ const m=String(x==null?"":x).match(/-?\d+/); return m?parseInt(m[0]):0; }
+function apSummen(){
+  const v=(C.vorteile||[]).reduce((a,r)=>a+apNum(r.ap),0), n=(C.nachteile||[]).reduce((a,r)=>a+apNum(r.ap),0);
+  const vs=document.getElementById("vsum"), ns=document.getElementById("nsum");
+  if(vs) vs.innerHTML = v ? `Summe: kostet <b style="color:var(--red)">−${v} AP</b>` : "";
+  if(ns) ns.innerHTML = n ? `Summe: bringt <b style="color:#3a7a2f">+${n} AP</b>` : "";
+}
+const renderVorteile = tableEditor("vorteile","vorteile",[{key:"name",list:"dl-vorteile"},{key:"ap",cls:"num"}],{name:"",ap:""}, apSummen);
+const renderNachteile = tableEditor("nachteile","nachteile",[{key:"name",list:"dl-nachteile"},{key:"ap",cls:"num"}],{name:"",ap:""}, apSummen);
+apSummen();
+mkDatalist("dl-vorteile",(DSA.VORTEILE||[]).map(v=>v.name));
+mkDatalist("dl-nachteile",(DSA.NACHTEILE||[]).map(v=>v.name));
+function addVN(arrName,render,kat,pickId){ const inp=document.getElementById(pickId), e=(kat||[]).find(x=>x.name===inp.value.trim()); if(!inp.value.trim())return; C[arrName].push(e?{name:e.name,ap:e.ap}:{name:inp.value.trim(),ap:""}); save(); render(); inp.value=""; }
+function addVorteil(){ addVN("vorteile",renderVorteile,DSA.VORTEILE,"vorteilpick"); apSummen(); }
+function addNachteil(){ addVN("nachteile",renderNachteile,DSA.NACHTEILE,"nachteilpick"); apSummen(); }
+bindText("sonderf",()=>C.sonderf,v=>C.sonderf=v);
+
+// ───────── Zauber & Liturgien ─────────
+const renderZauber = tableEditor("zauber","zauber",[{key:"name",ph:"z.B. Ignifaxius"},{key:"probe",ph:"KL/IN/FF"},{key:"fw",cls:"num"},{key:"kosten",cls:"num"},{key:"rw",ph:"Reichweite"},{key:"wd",ph:"Wirkungsdauer"},{key:"wirkung",ph:"kurz"}],{name:"",probe:"",fw:"",kosten:"",rw:"",wd:"",wirkung:""});
+const renderLiturgien = tableEditor("liturgien","liturgien",[{key:"name",ph:"z.B. Bann des Lichts"},{key:"probe",ph:"MU/KL/IN"},{key:"fw",cls:"num"},{key:"kosten",cls:"num"},{key:"rw",ph:"Reichweite"},{key:"wd",ph:"Wirkungsdauer"},{key:"wirkung",ph:"kurz"}],{name:"",probe:"",fw:"",kosten:"",rw:"",wd:"",wirkung:""});
+mkDatalist("dl-zauber",(DSA.ZAUBER||[]).map(z=>z.name));
+mkDatalist("dl-liturgien",(DSA.LITURGIEN||[]).map(z=>z.name));
+function addAusKatalog(arrName, render, katalog, pickId){
+  const inp=document.getElementById(pickId), e=(katalog||[]).find(x=>x.name===inp.value.trim());
+  if(!e) return;
+  C[arrName].push({name:e.name,probe:e.probe.join("/"),fw:"",kosten:e.kosten,rw:e.rw,wd:e.dauer,wirkung:""});
+  save(); render(); inp.value="";
+}
+function addZauberAusListe(){ addAusKatalog("zauber",renderZauber,DSA.ZAUBER,"zauberpick"); }
+function addLiturgieAusListe(){ addAusKatalog("liturgien",renderLiturgien,DSA.LITURGIEN,"liturgiepick"); }
+bindText("magie-leiteig",()=>C.magie.leiteig,v=>C.magie.leiteig=v);
+bindText("magie-tradition",()=>C.magie.tradition,v=>C.magie.tradition=v);
+bindText("karma-leiteig",()=>C.karma.leiteig,v=>C.karma.leiteig=v);
+bindText("karma-tradition",()=>C.karma.tradition,v=>C.karma.tradition=v);
+
+// ───────── Heldenerschaffung ─────────
+function finalEig(){
+  const mod=SPEZ_MOD[C.spezies]||{fix:{},frei1:false,minus2:null}, f={};
+  EIG.forEach(([k])=>{
+    let v=(C.create.purchased[k]||8)+(mod.fix[k]||0);
+    if(mod.frei1 && C.create.frei1===k) v+=1;
+    if(mod.minus2 && C.create.minus2===k) v-=(mod.minusVal||2);
+    f[k]=v;
+  });
+  return f;
+}
+function uebernehmenEig(f){
+  EIG.forEach(([k])=>{ C.eig[k]=f[k]; });
+  document.querySelectorAll('#eig .b input').forEach((inp,i)=>{ inp.value=C.eig[EIG[i][0]]; });
+  save(); renderDerived(); renderTechniken();
+}
+function renderErschaffung(){
+  const box=document.getElementById("erschaffung");
+  const grad=C.create.grad, g=GRADE[grad]||GRADE["Erfahren"];
+  const sp=C.spezies, mod=SPEZ_MOD[sp], fin=finalEig();
+  let sumP=0, apEig=0;
+  EIG.forEach(([k])=>{ const p=C.create.purchased[k]||8; sumP+=p; apEig+=eigAPfor(p); });
+  const apProf=((DSA.PROFESSIONEN||{})[C.profession]||{}).cost||0, apVari=((DSA.VARIANTEN||{})[C.variante]||{}).cost||0;
+  const apSpez=SPEZ_AP[sp]||0, apTalente=talenteAPgesamt(), apKT=kampftechnikAPgesamt(), apVor=vorteilAP(), apNach=nachteilAP();
+  const uebrig=g.ap-apSpez-apProf-apVari-apEig-apTalente-apKT-apVor+apNach;
+  const fixTxt = (sp&&mod) ? Object.entries(mod.fix).map(([k,v])=>`${NAME[k]} ${v>0?'+':''}${v}`).join(', ') : '';
+  let h='';
+  h+=`<div class="choice">Erfahrungsgrad:
+        <select id="gradSel">${Object.keys(GRADE).map(n=>`<option${n===grad?' selected':''}>${n}</option>`).join('')}</select>
+        <span class="hint" style="margin-left:6px">${g.ap} AP · Eigenschafts-Höchstwert ${g.max} · max. Summe ${g.summe}</span></div>`;
+  h+=`<div class="konto">
+        <span class="kpos">Budget: <b>${g.ap}</b></span>
+        <span class="kpos">− Spezies (${sp||'—'}): ${apSpez}</span>
+        <span class="kpos">− Profession (${C.profession||'—'}): ${apProf}${apVari?` ${apVari>0?'+':''}${apVari} Variante`:''}</span>
+        <span class="kpos" style="color:var(--dim)">Kultur (${C.kultur||'—'}): gratis</span>
+        <span class="kpos">− Eigenschaften: ${apEig}</span>
+        <span class="kpos">− Talent-Steigerungen: ${apTalente}</span>
+        <span class="kpos">− Kampftechnik-Steigerungen: ${apKT}</span>
+        ${apVor?`<span class="kpos">− Vorteile: ${apVor}</span>`:''}
+        ${apNach?`<span class="kpos" style="color:#2e6e3e">+ Nachteile: ${apNach}</span>`:''}
+        <span class="kpos">= übrig: <b class="${uebrig<0?'bad':''}">${uebrig}</b> AP</span></div>`;
+  h+=`<div class="hint">Spezies, Profession, Eigenschaften, Talent- und Kampftechnik-Steigerungen über dem Paket sowie Vor-/Nachteile sind verrechnet (Kultur ist gratis). Noch nicht im Topf: Zauber/Liturgien, Sonderfertigkeiten.</div>`;
+  if(sp){
+    h+=`<div class="choice"><b>${sp}</b>${fixTxt?` — ${fixTxt}`:''} · Spezies-Vorteile: ${SPEZ_AUTO[sp]||'—'}</div>`;
+    if(mod.frei1) h+=`<div class="choice">Freie Steigerung (+1) auf: <select id="frei1"><option value="">– wählen –</option>${EIG.map(([k,v])=>`<option value="${k}"${C.create.frei1===k?' selected':''}>${v}</option>`).join('')}</select></div>`;
+    if(mod.minus2) h+=`<div class="choice">Schwächung (−${mod.minusVal||2}) auf: <select id="minus2"><option value="">– wählen –</option>${mod.minus2.map(k=>`<option value="${k}"${C.create.minus2===k?' selected':''}>${NAME[k]}</option>`).join('')}</select></div>`;
+  } else h+=`<div class="hint">Wähle oben im Kopf eine Spezies, dann werden ihre Änderungen verrechnet.</div>`;
+  h+=`<div class="plbl" style="margin-top:8px;font-size:11px;font-weight:500;color:var(--dim);text-transform:uppercase;letter-spacing:.04em">Eigenschaften verteilen <span style="text-transform:none;font-weight:400">— gekauft (kostet AP) + Bonus (Spezies/frei, kostenlos) = Endwert</span></div>`;
+  h+=EIG.map(([k,voll])=>{
+    const p=C.create.purchased[k]||8, over=p>g.max, bonus=(fin[k]??p)-p;
+    const bTxt = bonus ? `<span class="ebonus">${bonus>0?'+':''}${bonus}</span>` : `<span class="ebonus" style="visibility:hidden">+0</span>`;
+    return `<div class="erow"><span class="en">${voll}</span>
+      <button data-em="${k}" data-d="-1">−</button><span class="pv ${over?'bad':''}">${p}</span><button data-em="${k}" data-d="1">+</button>
+      ${bTxt}<span class="fin">= ${fin[k]}</span><span class="ap">${eigAPfor(p)} AP</span></div>`;
+  }).join('');
+  h+=`<div class="konto" style="margin-top:8px">
+        <span class="kpos">Eigenschafts-Summe: <b class="${sumP>g.summe?'bad':''}">${sumP}</b> / ${g.summe}</span>
+        <button class="acc" id="uebernehmen">Eigenschaften in den Bogen übernehmen</button></div>`;
+  box.innerHTML=h;
+  document.getElementById("gradSel").onchange=e=>{ C.create.grad=e.target.value; save(); renderErschaffung(); };
+  const f1=document.getElementById("frei1"); if(f1) f1.onchange=e=>{ C.create.frei1=e.target.value; save(); renderErschaffung(); };
+  const m2=document.getElementById("minus2"); if(m2) m2.onchange=e=>{ C.create.minus2=e.target.value; save(); renderErschaffung(); };
+  box.querySelectorAll("button[data-em]").forEach(b=>b.onclick=()=>{
+    const k=b.dataset.em, dd=+b.dataset.d, cur=C.create.purchased[k]||8;
+    C.create.purchased[k]=Math.max(8,Math.min(g.max,cur+dd)); save(); renderErschaffung();
+  });
+  document.getElementById("uebernehmen").onclick=()=>uebernehmenEig(finalEig());
+}
+renderErschaffung();
+
+// ───────── Seiten umschalten ─────────
+document.querySelectorAll("#tabs button").forEach(btn=>btn.onclick=()=>{
+  document.querySelectorAll("#tabs button").forEach(b=>b.classList.remove("active"));
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  btn.classList.add("active");
+  document.querySelector(`.page[data-page="${btn.dataset.p}"]`).classList.add("active");
+});
+
+// ───────── Firebase Live-Sync (geteilter Spieltisch) ─────────
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyAFQCS-Z_K9pKHXonOy88eT583spx0nkZk",
+  authDomain: "dsa-tisch.firebaseapp.com",
+  databaseURL: "https://dsa-tisch-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "dsa-tisch",
+  storageBucket: "dsa-tisch.firebasestorage.app",
+  messagingSenderId: "793536952819",
+  appId: "1:793536952819:web:d5fe52d5311ee582333a86"
+};
+const SYNC = { db:null, tisch:"", heldId:"", ref:null, partyRef:null, lastPushJson:"", applying:false, pushTimer:null, viewing:null, lastHelden:{} };
+SYNC.heldId = localStorage.getItem('dsa-heldid') || ('h'+Math.random().toString(36).slice(2,10));
+localStorage.setItem('dsa-heldid', SYNC.heldId);
+
+// Den ganzen Bogen aus C neu zeichnen (für eingehende Fern-Änderungen, z.B. von Kurt)
+function renderAll(){
+  document.getElementById('name').value = C.name||"";
+  document.querySelectorAll('#persdaten input[data-pd]').forEach(i=> i.value = C.persdaten[i.dataset.pd]||"");
+  { const nz=document.getElementById('notizen'); if(nz) nz.value = C.notizen||""; }
+  { const rf=document.getElementById('regelfrei'); if(rf) rf.checked = !!C.regelfrei; }
+  { const pa=document.getElementById('profAlle'); if(pa) pa.checked = !!C.profAlle; }
+  renderSozialstatus();
+  document.querySelectorAll('#eig input[data-eig]').forEach(i=> i.value = C.eig[i.dataset.eig]);
+  renderSpezies();
+  boundText.forEach(b=>{ if(b.el) b.el.value = b.get()||""; });
+  renderKulturen(); renderVariante(); renderTalentSelect(); renderLore();
+  renderDerived(); renderEnergie(); renderSchmerz();
+  renderTalente(); renderTechniken(); renderZustaende();
+  renderSprachen(); renderSchriften(); renderNah(); renderFern(); renderRuestung(); renderSchild();
+  renderInv(); renderGewicht();
+  renderVorteile(); renderNachteile(); apSummen(); renderZauber(); renderLiturgien();
+  renderErschaffung();
+}
+
+function tischStatus(txt,on){ const s=document.getElementById('tischstatus'); if(s){ s.textContent=txt; s.style.color=on?'var(--gold)':'var(--dim)'; } const b=document.getElementById('tischbtn'); if(b) b.textContent=on?'verlassen':'beitreten'; }
+function renderParty(helden){
+  SYNC.lastHelden = helden || {};
+  const box=document.getElementById('party'); if(!box) return;
+  const ids=Object.keys(SYNC.lastHelden);
+  if(!SYNC.tisch || !ids.length){ box.innerHTML=""; return; }
+  box.innerHTML = ids.map(id=>{
+    const h=SYNC.lastHelden[id]||{}, me=id===SYNC.heldId, viewed=id===SYNC.viewing, lep=h.lep||{}, asp=h.asp||{};
+    let s=`LeP ${lep.akt??'?'}/${lep.max??'?'}`; if((asp.max||0)>0) s+=` · AsP ${asp.akt}/${asp.max}`;
+    const bg = viewed ? '#ead9a6' : me ? '#fff7e1' : '#fffdf4';
+    return `<span onclick="viewHero('${id}')" title="Bogen ansehen" style="cursor:pointer;border:1px solid ${viewed?'var(--red)':'var(--line)'};border-radius:5px;padding:3px 8px;font-size:12px;background:${bg}"><b>${esc(h.name||'Held')}</b>${me?' (du)':''} <span style="color:var(--dim)">${s}</span></span>`;
+  }).join("");
+}
+function fbOnSave(){ if(SYNC.tisch && !SYNC.applying){ clearTimeout(SYNC.pushTimer); SYNC.pushTimer=setTimeout(fbPush,400); } }
+function fbPush(){ if(!SYNC.tisch || !SYNC.ref) return; const p=JSON.parse(JSON.stringify(C)); SYNC.lastPushJson=JSON.stringify(p); SYNC.ref.set(p).catch(e=>console.warn('FB push',e)); }
+function _loadIntoC(src){
+  Object.assign(C, JSON.parse(JSON.stringify(src||{})));
+  for(const k of ["persdaten","eig","lep","asp","kap","schicksal","talente","geld","techniken","zustaende","magie","karma"]) C[k]=Object.assign({}, DEFAULT[k], C[k]||{});
+  for(const k of ["sprachen","schriften","nahwaffen","fernwaffen","ruestung","schild","inventar","zauber","liturgien","vorteile","nachteile"]) if(!Array.isArray(C[k])) C[k]=[];
+  C.create=Object.assign({}, DEFAULT.create, C.create||{}); C.create.purchased=Object.assign({}, DEFAULT.create.purchased, C.create.purchased||{});
+}
+function fbApplyRemote(remote){
+  if(SYNC.viewing){ localStorage.setItem('dsa-bogen', JSON.stringify(remote)); return; }  // sehe fremden Bogen an -> meinen nur im Speicher nachführen
+  SYNC.applying=true;
+  try{ _loadIntoC(remote); localStorage.setItem('dsa-bogen', JSON.stringify(C)); renderAll(); }
+  finally{ SYNC.applying=false; }
+}
+// Fremden Bogen ansehen (nur lesen) bzw. zum eigenen zurück
+function viewHero(id){
+  if(!id || id===SYNC.heldId){ viewMyself(); return; }
+  const h=(SYNC.lastHelden||{})[id]; if(!h) return;
+  SYNC.viewing=id; document.body.classList.add('viewing');
+  _loadIntoC(h); renderAll(); renderParty(SYNC.lastHelden);
+  const vb=document.getElementById('viewbanner'); if(vb){ vb.style.display=''; const vn=document.getElementById('viewname'); if(vn) vn.textContent=(h.name||'Held'); }
+}
+function viewMyself(){
+  if(!SYNC.viewing) return;
+  SYNC.viewing=null; document.body.classList.remove('viewing');
+  const vb=document.getElementById('viewbanner'); if(vb) vb.style.display='none';
+  try{ _loadIntoC(JSON.parse(localStorage.getItem('dsa-bogen'))||{}); }catch(e){}
+  renderAll(); renderParty(SYNC.lastHelden);
+}
+function tischToggle(){ if(SYNC.tisch) tischVerlassen(); else tischBeitreten(document.getElementById('tischcode').value); }
+function tischBeitreten(code){
+  code=(code||"").trim().toLowerCase().replace(/[^a-z0-9_-]/g,'');
+  if(!code) return;
+  if(typeof firebase==="undefined"){ tischStatus("Firebase nicht geladen (online?)",false); return; }
+  try{ if(!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG); SYNC.db=firebase.database(); }
+  catch(e){ tischStatus("Fehler: "+e.message,false); return; }
+  if(SYNC.ref) SYNC.ref.off(); if(SYNC.partyRef) SYNC.partyRef.off();
+  SYNC.tisch=code; localStorage.setItem('dsa-tisch',code);
+  const ci=document.getElementById('tischcode'); if(ci) ci.value=code;
+  SYNC.ref = SYNC.db.ref(`tische/${code}/helden/${SYNC.heldId}`);
+  SYNC.ref.once('value').then(snap=>{
+    if(snap.val()!=null) fbApplyRemote(snap.val()); else fbPush();
+    SYNC.ref.on('value', s=>{ const r=s.val(); if(r==null) return; if(JSON.stringify(r)===SYNC.lastPushJson) return; fbApplyRemote(r); });
+  }).catch(e=>tischStatus("Lesefehler: "+e.message,false));
+  SYNC.partyRef = SYNC.db.ref(`tische/${code}/helden`);
+  SYNC.partyRef.on('value', s=>{ const helden=s.val()||{}; renderParty(helden); if(SYNC.viewing){ const vh=helden[SYNC.viewing]; if(vh){ _loadIntoC(vh); renderAll(); } else viewMyself(); } });
+  tischStatus(`verbunden: „${code}”`, true);
+}
+function tischVerlassen(){ if(SYNC.ref){SYNC.ref.off();SYNC.ref=null;} if(SYNC.partyRef){SYNC.partyRef.off();SYNC.partyRef=null;} SYNC.tisch=""; localStorage.removeItem('dsa-tisch'); renderParty({}); tischStatus("nicht verbunden (nur lokal)",false); }
+(function(){ const c=localStorage.getItem('dsa-tisch'); if(c){ const i=document.getElementById('tischcode'); if(i) i.value=c; setTimeout(()=>tischBeitreten(c),400); } })();
+
+// ───────── AP-Effizienz-Rangliste ─────────
+const _SF={A:1,B:2,C:3,D:4};
+function _apW(sf,n){ const b=_SF[sf]||2; let t=0; for(let i=1;i<=n;i++) t+=b*Math.max(1,i-11); return t; }
+function _ktW(sf,n){ const b=_SF[sf]||2; let t=0; for(let i=1;i<=n;i++) t+=b*Math.max(1,(6+i)-11); return t; }
+
+function _kultAP(kname){
+  const k=(DSA.KULTUREN||{})[kname]; if(!k) return 0;
+  return (k.paket||[]).reduce((s,t)=>t.name?s+_apW((DSA.TALENT_SF||{})[t.name]||'B',t.value||0):s,0);
+}
+function _profAP(pname){
+  const p=(DSA.PROFESSIONEN||{})[pname]; if(!p) return 0;
+  let t=0;
+  for(const x of (p.talente||[])) if(x.name) t+=_apW((DSA.TALENT_SF||{})[x.name]||'B',x.value||0);
+  for(const kt of (p.kampftechniken||[])) if(kt.name) t+=_ktW((DSA.KT_SF||{})[kt.name]||'B',kt.value||0);
+  if(p.wahlKT) t+=_ktW('B',p.wahlKT.value||0);
+  for(const sf of (p.sf||[])) t+=sf.ap||0;
+  for(const z of (p.zauber||[])) if(z.name) t+=_apW((DSA.ZAUBER_SF||{})[z.name]||'B',z.value||0);
+  for(const l of (p.liturgien||[])) if(l.name) t+=_apW((DSA.LITURGIEN_SF||{})[l.name]||'B',l.value||0);
+  return t;
+}
+function _variDelta(vname,pname){
+  const v=(DSA.VARIANTEN||{})[vname]||{}, p=(DSA.PROFESSIONEN||{})[pname]||{};
+  const bT=Object.fromEntries((p.talente||[]).filter(t=>t.name).map(t=>[t.name,t.value||0]));
+  const bK=Object.fromEntries((p.kampftechniken||[]).filter(k=>k.name).map(k=>[k.name,k.value||0]));
+  let d=0;
+  for(const t of (v.talente||[])){
+    if(!t.name) continue;
+    const sf=(DSA.TALENT_SF||{})[t.name]||'B', b=bT[t.name]||0, dv=t.value||0;
+    d+=dv>=0?_apW(sf,b+dv)-_apW(sf,b):_apW(sf,b+dv)-_apW(sf,b);
+  }
+  for(const kt of (v.kampftechniken||[])){
+    if(!kt.name) continue;
+    const sf=(DSA.KT_SF||{})[kt.name]||'B', b=bK[kt.name]||0, dv=kt.value||0;
+    d+=dv>=0?_ktW(sf,b+dv)-_ktW(sf,b):_ktW(sf,b+dv)-_ktW(sf,b);
+  }
+  for(const sa of (v.sfAend||[])) d+=sa.aktiv?(sa.ap||0):-(sa.ap||0);
+  if(v.wahlKTEntfernt&&p.wahlKT) d-=_ktW('B',p.wahlKT.value||0);
+  return d;
+}
+function _besteVar(pname){
+  const p=(DSA.PROFESSIONEN||{})[pname]||{};
+  const base=_profAP(pname), cost=p.cost||0;
+  let bestNet=base-cost, bestV=null;
+  for(const vn of (p.varianten||[])){
+    const v=(DSA.VARIANTEN||{})[vn]||{};
+    const net=base+_variDelta(vn,pname)-cost-(v.cost||0);
+    if(net>bestNet){ bestNet=net; bestV=vn; }
+  }
+  return [bestV,bestNet];
+}
+
+let _rkCache=null, _rkLoading=false, _rkLimit=100, _rkLastFilter='';
+function _buildRanking(){
+  if(_rkCache) return _rkCache;
+  const rows=[], PR=DSA.PROFESSIONEN||{};
+  for(const [spez,kList] of Object.entries(KULTUREN)){
+    const spezKost=SPEZ_AP[spez]||0;
+    for(const kname of kList){
+      const kd=(DSA.KULTUREN||{})[kname]; if(!kd) continue;
+      const kap=_kultAP(kname), kNet=kap-spezKost;
+      const allTyp=new Set([...(kd.profWeltlich||[]),...(kd.profMagisch||[]),...(kd.profGeweiht||[])]);
+      for(const [pname,p] of Object.entries(PR)){
+        if(p.cost==null) continue;
+        if(p.rassenReq && p.rassenReq!==spez) continue;
+        const [vname,pNet]=_besteVar(pname);
+        rows.push({total:kNet+pNet,spez,kname,pname,vname,kNet,pNet,typisch:allTyp.has(pname),gr:p.gr});
+      }
+    }
+  }
+  rows.sort((a,b)=>b.total-a.total);
+  let rg=1;
+  for(let i=0;i<rows.length;i++){ if(i>0&&rows[i].total<rows[i-1].total) rg=i+1; rows[i].rang=rg; }
+  _rkCache=rows;
+  return rows;
+}
+
+let _rkSelected=null, _rkShown=[];
+function renderRanking(){
+  const fSpez=(document.getElementById('rk-spez')||{}).value||'';
+  const fGr=parseInt((document.getElementById('rk-gr')||{}).value)||0;
+  const fTyp=document.getElementById('rk-typ')?.checked||false;
+  const fQ=((document.getElementById('rk-suche')||{}).value||'').toLowerCase().trim();
+  const tbody=document.getElementById('rk-tbody'); if(!tbody) return;
+  if(!_rkCache){
+    if(!_rkLoading){
+      _rkLoading=true;
+      tbody.innerHTML='<tr><td colspan="9" style="padding:20px;text-align:center;color:var(--dim)">Berechne …</td></tr>';
+      setTimeout(()=>{ _buildRanking(); _rkLoading=false; renderRanking(); }, 20);
+    }
+    return;
+  }
+  const filterKey=fSpez+'|'+fGr+'|'+fTyp+'|'+fQ;
+  if(filterKey!==_rkLastFilter){ _rkLimit=100; _rkLastFilter=filterKey; }
+  const all=_buildRanking();
+  let rows=all;
+  if(fSpez) rows=rows.filter(r=>r.spez===fSpez);
+  if(fGr) rows=rows.filter(r=>r.gr===fGr);
+  if(fTyp) rows=rows.filter(r=>r.typisch);
+  if(fQ) rows=rows.filter(r=>(r.kname+r.pname+r.spez+(r.vname||'')).toLowerCase().includes(fQ));
+  const MAX=_rkLimit; _rkShown=rows.slice(0,MAX); const shown=_rkShown;
+  const GR={1:'weltl.',2:'mag.',3:'gew.'};
+  const cnt=document.getElementById('rk-count');
+  if(cnt) cnt.textContent=`${rows.length.toLocaleString('de-DE')} Kombinationen${rows.length>MAX?` · zeige ${MAX} von ${rows.length}`:''}`;
+  _rkSelected=null;
+  const ub=document.getElementById('rk-uebernehmen'); if(ub) ub.style.display='none';
+  tbody.innerHTML=shown.map((r,i)=>`<tr class="${r.typisch?'rk-typ':''}" data-i="${i}">
+    <td class="rk-rg">${r.rang}</td>
+    <td>${esc(r.spez)}</td>
+    <td>${esc(r.kname)}</td>
+    <td>${esc(r.pname)}${r.vname?` <span class="rk-var">[${esc(r.vname)}]</span>`:''}</td>
+    <td class="rk-gr">${GR[r.gr]||'?'}${r.typisch?' ✓':''}</td>
+    <td class="rk-net ${r.kNet>=0?'rk-pos':'rk-neg'}">${r.kNet>=0?'+':''}${r.kNet}</td>
+    <td class="rk-net ${r.pNet>=0?'rk-pos':'rk-neg'}">${r.pNet>=0?'+':''}${r.pNet}</td>
+    <td class="rk-tot ${r.total>=0?'rk-pos':'rk-neg'}">${r.total>=0?'+':''}${r.total}</td>
+    <td><button class="rk-apply" onclick="rkApply(${i})">→ Bogen</button></td>
+  </tr>`).join('')
+  +(rows.length>MAX?`<tr><td colspan="9" style="text-align:center;padding:8px"><button onclick="_rkLimit+=100;renderRanking()" style="font-size:13px;padding:4px 14px">Weitere 100 laden (${rows.length-MAX} verbleiben)</button></td></tr>`:'');
+  tbody.querySelectorAll('tr[data-i]').forEach(tr=>tr.onclick=e=>{
+    if(e.target.classList.contains('rk-apply')) return;
+    tbody.querySelectorAll('tr').forEach(r=>r.style.background='');
+    tr.style.background='#f3e7bd';
+    _rkSelected=shown[+tr.dataset.i];
+    if(ub){ ub.style.display=''; ub.textContent=`→ ${_rkSelected.spez} · ${_rkSelected.kname} · ${_rkSelected.pname}${_rkSelected.vname?` [${_rkSelected.vname}]`:''} übernehmen`; }
+  });
+}
+function rkApply(idx){ const r=_rkShown[idx]; if(r) _rkApplyRow(r); }
+function rkAuswahlUebernehmen(){ if(_rkSelected) _rkApplyRow(_rkSelected); }
+function _rkApplyRow(r){
+  C.spezies=r.spez; C.kultur=r.kname; C.profession=r.pname; C.variante=r.vname||''; save();
+  document.querySelector('.tabs button[data-p="erschaffung"]')?.click();
+  renderSpezies(); renderKulturen(); renderVariante(); renderDerived(); renderErschaffung(); renderTalentSelect(); renderTalente(); renderLore(); renderSozialstatus();
+}
+// Rangliste beim Öffnen des Tabs laden
+(function(){
+  const rkBtn=document.querySelector('.tabs button[data-p="rangliste"]');
+  if(rkBtn){ const orig=rkBtn.onclick; rkBtn.onclick=e=>{ if(orig) orig.call(rkBtn,e); renderRanking(); }; }
+})();
+</script>
+</body>
+</html>

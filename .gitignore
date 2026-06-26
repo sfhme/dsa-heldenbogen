@@ -1,0 +1,5 @@
+optolith-data/
+*.pdf
+__pycache__/
+*.pyc
+.claude/
