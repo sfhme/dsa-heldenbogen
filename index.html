@@ -168,6 +168,7 @@
     </div>
     <div class="felder" id="persdaten"></div>
     <button class="acc" id="aussehenbtn" type="button" onclick="aussehenVorschlag()" style="margin-top:6px;font-size:12px;width:auto">Aussehen würfeln (Größe, Gewicht, Haar- &amp; Augenfarbe nach Spezies/Kultur)</button>
+    <label style="display:block;margin-top:8px">Notizen / Hintergrund <span style="font-weight:normal;color:var(--dim);font-size:11px">(für dich – und Kurt liest sie als Spielleiter mit)</span><textarea id="notizen" rows="2" placeholder="Backstory, Ziele, Geheimnisse, Beziehungen …" style="width:100%;resize:vertical;font:inherit;padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:#fffdf4;color:var(--ink)"></textarea></label>
   </div>
 
   <div id="lorebox" class="lorebox"></div>
@@ -555,6 +556,7 @@ const eigAPfor = p => { let s=0; for(let v=9;v<=p;v++) s+=eigPunktKosten(v); ret
 // ───────── Speicher (mit Vorgaben mischen, damit alte Stände erhalten bleiben) ─────────
 const DEFAULT = { name:"",
   persdaten:{familie:"",geburtsort:"",alter:"",groesse:"",gewicht:"",haarfarbe:"",augenfarbe:"",titel:"",sozialstatus:""},
+  notizen:"",
   spezies:"", kultur:"", profession:"", variante:"",
   eig:{MU:12,KL:12,IN:12,CH:12,FF:12,GE:12,KO:12,KK:12},
   lep:{akt:30,max:30}, asp:{akt:0,max:0}, kap:{akt:0,max:0}, schicksal:{akt:3,max:3},
@@ -612,6 +614,8 @@ const PERSF = [["familie","Familie"],["geburtsort","Geburtsort"],["alter","Alter
 const pdBox=document.getElementById("persdaten");
 pdBox.innerHTML = PERSF.map(([k,l])=>`<label>${l}<input value="${esc(C.persdaten[k])}" data-pd="${k}"${k==='sozialstatus'?' list="dl-sozialstatus"':''}></label>`).join('');
 pdBox.querySelectorAll("input[data-pd]").forEach(i=>i.oninput=()=>{ C.persdaten[i.dataset.pd]=i.value; save(); });
+const notizEl=document.getElementById("notizen");
+if(notizEl){ notizEl.value=C.notizen||""; notizEl.oninput=()=>{ C.notizen=notizEl.value; save(); }; }
 // Aussehensvorschlag: Größe/Gewicht würfeln + typische Haar-/Augenfarbe nach Kultur (sonst Spezies)
 function rollDice(dice){ let s=0; (dice||[]).forEach(d=>{ const a=Math.abs(d.amount||0), sign=(d.amount||0)<0?-1:1; for(let i=0;i<a;i++) s+=sign*(1+Math.floor(Math.random()*(d.sides||6))); }); return s; }
 function aussehenVorschlag(){
@@ -1118,6 +1122,7 @@ localStorage.setItem('dsa-heldid', SYNC.heldId);
 function renderAll(){
   document.getElementById('name').value = C.name||"";
   document.querySelectorAll('#persdaten input[data-pd]').forEach(i=> i.value = C.persdaten[i.dataset.pd]||"");
+  { const nz=document.getElementById('notizen'); if(nz) nz.value = C.notizen||""; }
   document.querySelectorAll('#eig input[data-eig]').forEach(i=> i.value = C.eig[i.dataset.eig]);
   spezSel.value = C.spezies||"";
   boundText.forEach(b=>{ if(b.el) b.el.value = b.get()||""; });
