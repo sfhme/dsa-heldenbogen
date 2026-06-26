@@ -12002,6 +12002,102 @@ window.DSADATEN = {
         "Rondrageweihter"
       ]
     },
+    "Tapo-Tikaute": {
+      "social": [
+        "Frei",
+        "Adel"
+      ],
+      "common": [
+        "Etikette",
+        "Fesseln",
+        "Götter & Kulte",
+        "Klettern",
+        "Körperbeherrschung",
+        "Mechanik",
+        "Metallbearbeitung",
+        "Rechnen",
+        "Rechtskunde",
+        "Sternkunde"
+      ],
+      "uncommon": [
+        "Boote & Schiffe",
+        "Fahrzeuge",
+        "Fischen & Angeln",
+        "Fliegen",
+        "Gassenwissen",
+        "Geographie",
+        "Musizieren",
+        "Reiten",
+        "Schlösserknacken",
+        "Schwimmen"
+      ],
+      "paket": [
+        {
+          "name": "Etikette",
+          "value": 2
+        },
+        {
+          "name": "Fesseln",
+          "value": 1
+        },
+        {
+          "name": "Götter & Kulte",
+          "value": 1
+        },
+        {
+          "name": "Klettern",
+          "value": 2
+        },
+        {
+          "name": "Körperbeherrschung",
+          "value": 1
+        },
+        {
+          "name": "Mechanik",
+          "value": 1
+        },
+        {
+          "name": "Metallbearbeitung",
+          "value": 1
+        },
+        {
+          "name": "Rechnen",
+          "value": 1
+        },
+        {
+          "name": "Rechtskunde",
+          "value": 1
+        },
+        {
+          "name": "Sternkunde",
+          "value": 1
+        }
+      ],
+      "commonVorteile": [
+        "Begabung (Klettern)",
+        "Gutaussehend",
+        "Schlangenmensch"
+      ],
+      "commonNachteile": [
+        "Angst vor",
+        "Persönlichkeitsschwächen",
+        "Schlechte Eigenschaft",
+        "Unfähig (Schwimmen)"
+      ],
+      "profWeltlich": [
+        "Bäuerin",
+        "Händler",
+        "Heiler",
+        "Höfling",
+        "Streuner"
+      ],
+      "profMagisch": [
+        "Intuitiver Zauberer"
+      ],
+      "profGeweiht": [
+        "Moha-Schamanin"
+      ]
+    },
     "Thorwaler": {
       "social": [
         "Frei",
@@ -13312,7 +13408,7 @@ window.DSADATEN = {
           "value": 1
         },
         {
-          "name": "Lederbearbeitung",
+          "name": "Lebensmittelbearbeitung",
           "value": 2
         },
         {
@@ -13620,7 +13716,7 @@ window.DSADATEN = {
         },
         {
           "name": "Zechen",
-          "value": 2
+          "value": 1
         }
       ],
       "commonVorteile": [
