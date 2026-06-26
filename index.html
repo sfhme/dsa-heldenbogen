@@ -612,8 +612,22 @@ const nameEl=document.getElementById("name"); nameEl.value=C.name||"";
 nameEl.oninput=()=>{ C.name=nameEl.value; save(); };
 const PERSF = [["familie","Familie"],["geburtsort","Geburtsort"],["alter","Alter"],["groesse","Größe"],["gewicht","Gewicht"],["haarfarbe","Haarfarbe"],["augenfarbe","Augenfarbe"],["titel","Titel"],["sozialstatus","Sozialstatus"]];
 const pdBox=document.getElementById("persdaten");
-pdBox.innerHTML = PERSF.map(([k,l])=>`<label>${l}<input value="${esc(C.persdaten[k])}" data-pd="${k}"${k==='sozialstatus'?' list="dl-sozialstatus"':''}></label>`).join('');
+pdBox.innerHTML = PERSF.map(([k,l])=> k==='sozialstatus'
+  ? `<label>${l}<select data-pd="sozialstatus" id="sozialstatus-sel"></select></label>`
+  : `<label>${l}<input value="${esc(C.persdaten[k])}" data-pd="${k}"></label>`).join('');
 pdBox.querySelectorAll("input[data-pd]").forEach(i=>i.oninput=()=>{ C.persdaten[i.dataset.pd]=i.value; save(); });
+{ const sozSel=document.getElementById("sozialstatus-sel"); if(sozSel) sozSel.onchange=()=>{ C.persdaten.sozialstatus=sozSel.value; save(); }; }
+// Sozialstatus als echtes Dropdown, Optionen je Kultur (DSA: nicht jede Kultur kennt jeden Stand)
+function renderSozialstatus(){
+  const sel=document.getElementById("sozialstatus-sel"); if(!sel) return;
+  const kd=kulturDaten(C.kultur);
+  let opts=(kd && Array.isArray(kd.social) && kd.social.length) ? kd.social.slice() : ["Unfrei","Frei","Niederadel","Adel","Hochadel"];
+  const cur=C.persdaten.sozialstatus||"";
+  if(cur && opts.indexOf(cur)<0) opts=[cur,...opts];   // bereits gewählten Wert nie verlieren
+  sel.innerHTML='<option value="">– wählen –</option>'+opts.map(o=>`<option${o===cur?" selected":""}>${esc(o)}</option>`).join("");
+  sel.value=cur;
+}
+renderSozialstatus();
 const notizEl=document.getElementById("notizen");
 if(notizEl){ notizEl.value=C.notizen||""; notizEl.oninput=()=>{ C.notizen=notizEl.value; save(); }; }
 // Aussehensvorschlag: Größe/Gewicht würfeln + typische Haar-/Augenfarbe nach Kultur (sonst Spezies)
@@ -670,8 +684,8 @@ function renderProfessionen(){
   if(cur){ if(![...prof.options].some(o=>o.value===cur)){ const o=document.createElement("option"); o.value=cur; o.textContent=cur; prof.appendChild(o); } prof.value=cur; }
   renderPaketVorschau();
 }
-spezSel.onchange=()=>{ C.spezies=spezSel.value; C.kultur=""; C.profession=""; C.variante=""; save(); renderKulturen(); renderDerived(); renderErschaffung(); renderTalentSelect(); renderTalente(); renderLore(); };
-kult.onchange=()=>{ C.kultur=kult.value; save(); renderProfessionen(); renderTalentSelect(); renderTalente(); renderLore(); };
+spezSel.onchange=()=>{ C.spezies=spezSel.value; C.kultur=""; C.profession=""; C.variante=""; save(); renderKulturen(); renderDerived(); renderErschaffung(); renderTalentSelect(); renderTalente(); renderLore(); renderSozialstatus(); };
+kult.onchange=()=>{ C.kultur=kult.value; save(); renderProfessionen(); renderTalentSelect(); renderTalente(); renderLore(); renderSozialstatus(); };
 prof.onchange=()=>{ C.profession=prof.value; C.variante=""; save(); renderVariante(); renderTalentSelect(); renderTalente(); renderLore(); };
 const profAlleChk=document.getElementById("profAlle"); if(profAlleChk) profAlleChk.onchange=renderProfessionen;
 // Hintergrund-Beschreibungen (Wiki Aventurica) zu Spezies/Kultur/Profession
@@ -1123,6 +1137,7 @@ function renderAll(){
   document.getElementById('name').value = C.name||"";
   document.querySelectorAll('#persdaten input[data-pd]').forEach(i=> i.value = C.persdaten[i.dataset.pd]||"");
   { const nz=document.getElementById('notizen'); if(nz) nz.value = C.notizen||""; }
+  renderSozialstatus();
   document.querySelectorAll('#eig input[data-eig]').forEach(i=> i.value = C.eig[i.dataset.eig]);
   spezSel.value = C.spezies||"";
   boundText.forEach(b=>{ if(b.el) b.el.value = b.get()||""; });
