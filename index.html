@@ -164,6 +164,7 @@
     <button class="acc" id="tischbtn" onclick="tischToggle()">beitreten</button>
     <span id="tischstatus" style="font-size:12px;color:var(--dim)">nicht verbunden (nur lokal)</span>
     <div id="party" style="flex-basis:100%;display:flex;flex-wrap:wrap;gap:6px"></div>
+    <div id="kampf" style="flex-basis:100%;display:none;flex-wrap:wrap;gap:8px;margin-top:4px;padding-top:6px;border-top:1px solid var(--border)"></div>
     <div id="viewbanner" style="display:none"><b>Du siehst <span id="viewname"></span>s Bogen</b> <span style="color:var(--dim)">— nur ansehen</span> <button class="acc" onclick="viewMyself()">← zurück zu meinem Bogen</button></div>
   </div>
 
@@ -352,6 +353,15 @@
       <div class="hint">1 Dukat = 10 Silbertaler = 100 Heller = 1000 Kreuzer.</div>
       <h3>Edelsteine, Schmuck &amp; Sonstiges</h3>
       <textarea id="edelsteine" placeholder="Wertgegenstände …" style="min-height:80px"></textarea>
+    </div>
+
+    <h2>Abenteuerpunkte</h2>
+    <div class="box">
+      <div class="geld">
+        <label>Verfügbar<input type="number" data-ap="verfuegbar"></label>
+        <label>Gesamt erhalten<input type="number" data-ap="erhalten"></label>
+      </div>
+      <div class="hint">Vom Spielleiter vergeben (auch per Sprache an Kurt). „Verfügbar" gibst du beim Steigern aus, „Gesamt" bestimmt den Erfahrungsgrad.</div>
     </div>
 
     <h2>Vertrautes / Tier</h2>
@@ -616,7 +626,7 @@ const DEFAULT = { name:"",
   notizen:"",
   spezies:"", kultur:"", profession:"", variante:"", regelfrei:false, profAlle:false,
   eig:{MU:12,KL:12,IN:12,CH:12,FF:12,GE:12,KO:12,KK:12},
-  lep:{akt:30,max:30}, asp:{akt:0,max:0}, kap:{akt:0,max:0}, schicksal:{akt:3,max:3},
+  lep:{akt:30,max:30}, asp:{akt:0,max:0}, kap:{akt:0,max:0}, schicksal:{akt:3,max:3}, ap:{erhalten:0,verfuegbar:0},
   vorteile:[], nachteile:[], sonderf:"",
   talente:{}, sprachen:[], schriften:[],
   techniken:{}, nahwaffen:[], fernwaffen:[], ruestung:[], schild:[], zustaende:{}, ksf:"",
@@ -1126,6 +1136,7 @@ function renderGewicht(){
 }
 renderGewicht();
 document.querySelectorAll("input[data-geld]").forEach(i=>{ i.value=C.geld[i.dataset.geld]||0; i.oninput=()=>{ C.geld[i.dataset.geld]=parseInt(i.value)||0; save(); }; });
+document.querySelectorAll("input[data-ap]").forEach(i=>{ i.value=(C.ap||{})[i.dataset.ap]||0; i.oninput=()=>{ (C.ap=C.ap||{})[i.dataset.ap]=parseInt(i.value)||0; save(); }; });
 bindText("edelsteine",()=>C.edelsteine,v=>C.edelsteine=v);
 bindText("tragkraft",()=>C.tragkraft,v=>C.tragkraft=v);
 bindText("tier",()=>C.tier,v=>C.tier=v);
@@ -1253,7 +1264,7 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "793536952819",
   appId: "1:793536952819:web:d5fe52d5311ee582333a86"
 };
-const SYNC = { db:null, tisch:"", heldId:"", ref:null, partyRef:null, lastPushJson:"", applying:false, pushTimer:null, viewing:null, lastHelden:{} };
+const SYNC = { db:null, tisch:"", heldId:"", ref:null, partyRef:null, kampfRef:null, lastPushJson:"", applying:false, pushTimer:null, viewing:null, lastHelden:{} };
 SYNC.heldId = localStorage.getItem('dsa-heldid') || ('h'+Math.random().toString(36).slice(2,10));
 localStorage.setItem('dsa-heldid', SYNC.heldId);
 
@@ -1278,6 +1289,24 @@ function renderAll(){
 }
 
 function tischStatus(txt,on){ const s=document.getElementById('tischstatus'); if(s){ s.textContent=txt; s.style.color=on?'var(--gold)':'var(--dim)'; } const b=document.getElementById('tischbtn'); if(b) b.textContent=on?'verlassen':'beitreten'; }
+function renderKampf(gegner){
+  const box=document.getElementById('kampf'); if(!box) return;
+  const namen=Object.keys(gegner||{});
+  if(!namen.length){ box.style.display='none'; box.innerHTML=''; return; }
+  box.style.display='flex';
+  box.innerHTML='<span style="font-size:11px;color:var(--red);font-weight:bold;align-self:center;letter-spacing:.06em">KAMPF</span>'
+    + namen.map(n=>{
+      const g=gegner[n]||{}, akt=g.lep_akt??g.lep_max??0, mx=g.lep_max||1;
+      const pct=Math.max(0,Math.min(100,Math.round(akt/mx*100)));
+      const col=pct>60?'#6a8f4a':pct>30?'#b87a20':'var(--red)';
+      const tot=akt<=0?' (†)':'';
+      return `<span style="display:flex;flex-direction:column;gap:2px;border:1px solid var(--border);border-radius:5px;padding:4px 8px;font-size:12px;min-width:90px">
+        <span style="font-weight:bold">${esc(n)}${tot}</span>
+        <span style="color:var(--dim)">LeP ${akt}/${mx}</span>
+        <div style="height:5px;border-radius:3px;background:var(--border);overflow:hidden"><div style="width:${pct}%;height:100%;background:${col};transition:width .4s"></div></div>
+      </span>`;
+    }).join('');
+}
 function renderParty(helden){
   SYNC.lastHelden = helden || {};
   const box=document.getElementById('party'); if(!box) return;
@@ -1294,7 +1323,7 @@ function fbOnSave(){ if(SYNC.tisch && !SYNC.applying){ clearTimeout(SYNC.pushTim
 function fbPush(){ if(!SYNC.tisch || !SYNC.ref) return; const p=JSON.parse(JSON.stringify(C)); SYNC.lastPushJson=JSON.stringify(p); SYNC.ref.set(p).catch(e=>console.warn('FB push',e)); }
 function _loadIntoC(src){
   Object.assign(C, JSON.parse(JSON.stringify(src||{})));
-  for(const k of ["persdaten","eig","lep","asp","kap","schicksal","talente","geld","techniken","zustaende","magie","karma"]) C[k]=Object.assign({}, DEFAULT[k], C[k]||{});
+  for(const k of ["persdaten","eig","lep","asp","kap","schicksal","talente","geld","techniken","zustaende","magie","karma","ap"]) C[k]=Object.assign({}, DEFAULT[k], C[k]||{});
   for(const k of ["sprachen","schriften","nahwaffen","fernwaffen","ruestung","schild","inventar","zauber","liturgien","vorteile","nachteile"]) if(!Array.isArray(C[k])) C[k]=[];
   C.create=Object.assign({}, DEFAULT.create, C.create||{}); C.create.purchased=Object.assign({}, DEFAULT.create.purchased, C.create.purchased||{});
 }
@@ -1326,7 +1355,7 @@ function tischBeitreten(code){
   if(typeof firebase==="undefined"){ tischStatus("Firebase nicht geladen (online?)",false); return; }
   try{ if(!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG); SYNC.db=firebase.database(); }
   catch(e){ tischStatus("Fehler: "+e.message,false); return; }
-  if(SYNC.ref) SYNC.ref.off(); if(SYNC.partyRef) SYNC.partyRef.off();
+  if(SYNC.ref) SYNC.ref.off(); if(SYNC.partyRef) SYNC.partyRef.off(); if(SYNC.kampfRef) SYNC.kampfRef.off();
   SYNC.tisch=code; localStorage.setItem('dsa-tisch',code);
   const ci=document.getElementById('tischcode'); if(ci) ci.value=code;
   SYNC.ref = SYNC.db.ref(`tische/${code}/helden/${SYNC.heldId}`);
@@ -1336,9 +1365,11 @@ function tischBeitreten(code){
   }).catch(e=>tischStatus("Lesefehler: "+e.message,false));
   SYNC.partyRef = SYNC.db.ref(`tische/${code}/helden`);
   SYNC.partyRef.on('value', s=>{ const helden=s.val()||{}; renderParty(helden); if(SYNC.viewing){ const vh=helden[SYNC.viewing]; if(vh){ _loadIntoC(vh); renderAll(); } else viewMyself(); } });
+  SYNC.kampfRef = SYNC.db.ref(`tische/${code}/spiel/gegner`);
+  SYNC.kampfRef.on('value', s=>{ renderKampf(s.val()||{}); });
   tischStatus(`verbunden: „${code}”`, true);
 }
-function tischVerlassen(){ if(SYNC.ref){SYNC.ref.off();SYNC.ref=null;} if(SYNC.partyRef){SYNC.partyRef.off();SYNC.partyRef=null;} SYNC.tisch=""; localStorage.removeItem('dsa-tisch'); renderParty({}); tischStatus("nicht verbunden (nur lokal)",false); }
+function tischVerlassen(){ if(SYNC.ref){SYNC.ref.off();SYNC.ref=null;} if(SYNC.partyRef){SYNC.partyRef.off();SYNC.partyRef=null;} if(SYNC.kampfRef){SYNC.kampfRef.off();SYNC.kampfRef=null;} SYNC.tisch=""; localStorage.removeItem('dsa-tisch'); renderParty({}); renderKampf({}); tischStatus("nicht verbunden (nur lokal)",false); }
 (function(){ const c=localStorage.getItem('dsa-tisch'); if(c){ const i=document.getElementById('tischcode'); if(i) i.value=c; setTimeout(()=>tischBeitreten(c),400); } })();
 
 // ───────── AP-Effizienz-Rangliste ─────────

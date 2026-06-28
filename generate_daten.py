@@ -275,6 +275,12 @@ O["AUSSEHEN_SPEZIES"] = aussehen_spz
 js = "window.DSADATEN = " + json.dumps(O, ensure_ascii=False) + ";\n"
 open("dsa-daten.js", "w", encoding="utf-8").write(js)
 print("dsa-daten.js geschrieben.")
+
+# JSON-Export für Kurt (Python-Backend liest kein JS, greift direkt auf JSON zu)
+open("dsa-kulturen.json", "w", encoding="utf-8").write(
+    json.dumps(O["KULTUREN"], ensure_ascii=False, indent=2) + "\n"
+)
+print(f"dsa-kulturen.json geschrieben: {len(O['KULTUREN'])} Kulturen.")
 for k in O:
     v = O[k]
     print(f"  {k}: {len(v)}")
